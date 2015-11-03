@@ -1,4 +1,4 @@
-package com.github.t1.meta;
+package com.github.t1.meta.test;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.github.t1.exap.Round;
+import com.github.t1.meta.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetaAnnotationProcessorTest {
@@ -32,7 +34,7 @@ public class MetaAnnotationProcessorTest {
     private String created(String className) {
         String pkg = getClass().getPackage().getName();
         String relativeName = getClass().getSimpleName() + className;
-        String createdResource = ENV.getCreatedResource(CLASS_OUTPUT, pkg, relativeName);
+        String createdResource = ENV.getCreatedResource(SOURCE_OUTPUT, pkg, relativeName);
         assertThat(createdResource) //
                 .describedAs("created class resource: %s ### %s\nactually found: %s", pkg, relativeName,
                         ENV.getCreatedResources())
@@ -46,10 +48,16 @@ public class MetaAnnotationProcessorTest {
         return new String(Files.readAllBytes(path));
     }
 
+    static class Nested {
+        boolean someBooleanProperty;
+    }
+
     @GenerateMeta
     static class Pojo {
         String value;
         int intValue;
+        URI myLittleUri;
+        // Nested nested;
     }
 
     @Test

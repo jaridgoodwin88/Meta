@@ -1,4 +1,4 @@
-package com.github.t1.meta;
+package com.github.t1.meta.test;
 
 import static org.assertj.core.api.Assertions.*;
 

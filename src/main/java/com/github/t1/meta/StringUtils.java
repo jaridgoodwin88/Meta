@@ -12,10 +12,9 @@ public class StringUtils {
     public static String camelToSpace(String string) {
         StringBuilder out = new StringBuilder();
         for (char c : string.toCharArray()) {
-            if (Character.isUpperCase(c))
-                out.append(' ').append(c);
-            else
-                out.append(c);
+            if (Character.isUpperCase(c) && out.length() > 0)
+                out.append(' ');
+            out.append(c);
         }
         return out.toString();
     }
