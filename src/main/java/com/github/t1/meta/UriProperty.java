@@ -1,4 +1,4 @@
-package com.github.t1.deployer.model;
+package com.github.t1.meta;
 
 import java.net.URI;
 import java.util.Optional;
