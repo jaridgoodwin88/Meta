@@ -26,11 +26,11 @@ public class MetaAnnotationProcessorTest$PojoProperties<B> {
     }
 
     public String $description() {
-        return "Pojo";
+        return "pojo javadoc";
     }
 
     public StringProperty<B> publicValue() {
-        return new StringProperty<>("publicValue", "Public Value", "",
+        return new StringProperty<>("publicValue", "Public Value", "public value javadoc",
                 source -> this.backtrack.apply(source).map(container -> container.publicValue));
     }
 

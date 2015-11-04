@@ -71,15 +71,19 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void metaProperties(Type pojoType, TypeGenerator type) {
-        type.addMethod("$id") //
-                .body("return \"" + initLower(pojoType.getRelativeName()) + "\";") //
-                .returnType("String");
-        type.addMethod("$title") //
-                .body("return \"" + camelToTitle(pojoType.getSimpleName()) + "\";") //
-                .returnType("String");
-        type.addMethod("$description") //
-                .body("return \"" + camelToTitle(pojoType.getSimpleName()) + "\";") //
-                .returnType("String");
+        stringMethod(type, "$id", initLower(pojoType.getRelativeName()));
+        stringMethod(type, "$title", camelToTitle(pojoType.getSimpleName()));
+        stringMethod(type, "$description", description(pojoType));
+    }
+
+    private void stringMethod(TypeGenerator type, String name, String result) {
+        type.addMethod(name).body("return \"" + result + "\";").returnType("String");
+    }
+
+    private String description(Type pojoType) {
+        if (pojoType.isAnnotated(JavaDoc.class))
+            return pojoType.getAnnotation(JavaDoc.class).value();
+        return camelToTitle(pojoType.getSimpleName());
     }
 
     private void fieldProperties(Type pojoType, TypeGenerator type) {
@@ -89,8 +93,10 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
             if (getter == null)
                 continue;
             type.addMethod(field.getName()) //
-                    .body("return new " + propertyType.getSimpleName() + "<>(\"" + field.getName() + "\", \""
-                            + propertyTitle(field) + "\", \"\",\n"
+                    .body("return new " + propertyType.getSimpleName() + "<>(" //
+                            + "\"" + field.getName() + "\", " //
+                            + "\"" + propertyTitle(field) + "\", " //
+                            + "\"" + propertyDescription(field) + "\",\n" //
                             + "                source -> this.backtrack.apply(source).map(container -> container."
                             + getter + "));") //
                     .returnType(propertyType).typeVar("B");
@@ -109,10 +115,6 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
         throw new UnsupportedOperationException("properties of type '" + type.getFullName() + "' not implemented, yet");
     }
 
-    private String propertyTitle(Field field) {
-        return camelToTitle(field.getName());
-    }
-
     private String getterFor(Type pojoType, Field field) {
         if (field.isPublic())
             return field.getName();
@@ -129,6 +131,16 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
                 + "or add a public getter method '" + getter + "()'; " //
                 + "or a fluent public getter method '" + fluentGetter + "()'.");
         return null;
+    }
+
+    private String propertyTitle(Field field) {
+        return camelToTitle(field.getName());
+    }
+
+    private String propertyDescription(Field field) {
+        if (field.isAnnotated(JavaDoc.class))
+            return field.getAnnotation(JavaDoc.class).value();
+        return "";
     }
 
     private boolean hasGettingMethod(Type pojoType, Field field, String getter) {

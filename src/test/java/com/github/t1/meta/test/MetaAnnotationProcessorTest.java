@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.github.t1.exap.Round;
+import com.github.t1.exap.*;
 import com.github.t1.exap.reflection.Message;
 import com.github.t1.meta.*;
 
@@ -55,7 +55,9 @@ public class MetaAnnotationProcessorTest {
     }
 
     @GenerateMeta
+    @JavaDoc("pojo javadoc")
     static class Pojo {
+        @JavaDoc("public value javadoc")
         public String publicValue;
         private int intValueWithGetter;
         private URI uriWithFluentGetter;
