@@ -18,4 +18,8 @@ public class StringUtils {
         }
         return out.toString();
     }
+
+    public static String camelToTitle(String string) {
+        return initUpper(camelToSpace(string));
+    }
 }

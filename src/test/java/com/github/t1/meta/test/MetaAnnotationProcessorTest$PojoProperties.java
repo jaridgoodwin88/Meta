@@ -29,19 +29,19 @@ public class MetaAnnotationProcessorTest$PojoProperties<B> {
         return "Pojo";
     }
 
-    public StringProperty<B> value() {
-        return new StringProperty<>("value", "Value", "",
-                source -> this.backtrack.apply(source).map(container -> container.value));
+    public StringProperty<B> publicValue() {
+        return new StringProperty<>("publicValue", "Public Value", "",
+                source -> this.backtrack.apply(source).map(container -> container.publicValue));
     }
 
-    public IntegerProperty<B> intValue() {
-        return new IntegerProperty<>("intValue", "Int Value", "",
-                source -> this.backtrack.apply(source).map(container -> container.intValue));
+    public IntegerProperty<B> intValueWithGetter() {
+        return new IntegerProperty<>("intValueWithGetter", "Int Value With Getter", "",
+                source -> this.backtrack.apply(source).map(container -> container.getIntValueWithGetter()));
     }
 
-    public UriProperty<B> myLittleUri() {
-        return new UriProperty<>("myLittleUri", "My Little Uri", "",
-                source -> this.backtrack.apply(source).map(container -> container.myLittleUri));
+    public UriProperty<B> uriWithFluentGetter() {
+        return new UriProperty<>("uriWithFluentGetter", "Uri With Fluent Getter", "",
+                source -> this.backtrack.apply(source).map(container -> container.uriWithFluentGetter()));
     }
 
 }

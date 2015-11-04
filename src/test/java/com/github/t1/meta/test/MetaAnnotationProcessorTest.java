@@ -3,6 +3,7 @@ package com.github.t1.meta.test;
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
+import static javax.tools.Diagnostic.Kind.*;
 import static javax.tools.StandardLocation.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.reflection.Message;
 import com.github.t1.meta.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -54,10 +56,25 @@ public class MetaAnnotationProcessorTest {
 
     @GenerateMeta
     static class Pojo {
-        String value;
-        int intValue;
-        URI myLittleUri;
+        public String publicValue;
+        private int intValueWithGetter;
+        private URI uriWithFluentGetter;
+
+        @SuppressWarnings("unused")
+        private boolean ungettable;
         // Nested nested;
+
+        public int getIntValueWithGetter() {
+            return intValueWithGetter;
+        }
+
+        public URI uriWithFluentGetter() {
+            return uriWithFluentGetter;
+        }
+
+        public int getUngettable() {
+            return 0;
+        }
     }
 
     @Test
@@ -68,5 +85,13 @@ public class MetaAnnotationProcessorTest {
 
         assertThat(created("$PojoProperties")) //
                 .isEqualTo(sourceOf(MetaAnnotationProcessorTest$PojoProperties.class));
+        assertThat(ENV.getMessages()).containsExactly( //
+                new Message(ENV.type(Pojo.class).getMethod("getUngettable"), WARNING,
+                        "looks like a getter for field ungettable but it has the wrong return type"), //
+                new Message(ENV.type(Pojo.class).getField("ungettable"), ERROR,
+                        "No matching getter found. Make the field public; " //
+                                + "or add a public getter method 'getUngettable()'; " //
+                                + "or a fluent public getter method 'ungettable()'.") //
+        );
     }
 }

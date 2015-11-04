@@ -42,7 +42,7 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
                 fieldProperties(pojoType, type);
             } catch (RuntimeException e) {
                 log.error("failed to process {}", pojoType.getFullName());
-                pojoType.error(e.toString());
+                pojoType.error(MetaAnnotationProcessor.class.getName() + ": " + e.toString());
             }
         }
         return false;
@@ -75,21 +75,25 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
                 .body("return \"" + initLower(pojoType.getRelativeName()) + "\";") //
                 .returnType("String");
         type.addMethod("$title") //
-                .body("return \"" + title(pojoType.getSimpleName()) + "\";") //
+                .body("return \"" + camelToTitle(pojoType.getSimpleName()) + "\";") //
                 .returnType("String");
         type.addMethod("$description") //
-                .body("return \"" + title(pojoType.getSimpleName()) + "\";") //
+                .body("return \"" + camelToTitle(pojoType.getSimpleName()) + "\";") //
                 .returnType("String");
     }
 
     private void fieldProperties(Type pojoType, TypeGenerator type) {
         for (Field field : pojoType.getAllFields()) {
+            Type propertyType = propertyType(field.getType());
+            String getter = getterFor(pojoType, field);
+            if (getter == null)
+                continue;
             type.addMethod(field.getName()) //
-                    .body("return new " + propertyType(field.getType()).getSimpleName() + "<>(\"" + field.getName()
-                            + "\", \"" + propertyTitle(field) + "\", \"\",\n"
+                    .body("return new " + propertyType.getSimpleName() + "<>(\"" + field.getName() + "\", \""
+                            + propertyTitle(field) + "\", \"\",\n"
                             + "                source -> this.backtrack.apply(source).map(container -> container."
-                            + field.getName() + "));") //
-                    .returnType(propertyType(field.getType())).typeVar("B");
+                            + getter + "));") //
+                    .returnType(propertyType).typeVar("B");
         }
     }
 
@@ -106,10 +110,36 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private String propertyTitle(Field field) {
-        return title(field.getName());
+        return camelToTitle(field.getName());
     }
 
-    private String title(String string) {
-        return initUpper(camelToSpace(string));
+    private String getterFor(Type pojoType, Field field) {
+        if (field.isPublic())
+            return field.getName();
+
+        String getter = "get" + initUpper(field.getName());
+        if (hasGettingMethod(pojoType, field, getter))
+            return getter + "()";
+
+        String fluentGetter = field.getName();
+        if (hasGettingMethod(pojoType, field, fluentGetter))
+            return fluentGetter + "()";
+
+        field.error("No matching getter found. Make the field public; " //
+                + "or add a public getter method '" + getter + "()'; " //
+                + "or a fluent public getter method '" + fluentGetter + "()'.");
+        return null;
+    }
+
+    private boolean hasGettingMethod(Type pojoType, Field field, String getter) {
+        if (!pojoType.hasMethod(getter))
+            return false;
+        Method method = pojoType.getMethod(getter);
+        if (!method.getParameters().isEmpty())
+            return false;
+        if (method.getReturnType().isA(field.getType()))
+            return true;
+        method.warning("looks like a getter for field " + field.getName() + " but it has the wrong return type");
+        return false;
     }
 }
