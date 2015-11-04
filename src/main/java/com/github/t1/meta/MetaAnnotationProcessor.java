@@ -40,6 +40,9 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
                 constructor(type, backtrackField);
                 metaProperties(pojoType, type);
                 fieldProperties(pojoType, type);
+            } catch (RuntimeException e) {
+                log.error("failed to process {}", pojoType.getFullName());
+                pojoType.error(e.toString());
             }
         }
         return false;
