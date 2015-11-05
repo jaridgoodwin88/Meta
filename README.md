@@ -53,3 +53,10 @@ and set the `Generated Source Directory` to `target/generated-test-sources/test-
 `Project Properties -> Java Compiler -> Annotation Processing -> Factory Path` and add a variable
 `M2_REPO/com/github/t1/meta/<version>/meta-<version>.jar`, where `<version>` is the current version of `meta`.
 
+## Lobok
+
+If you use `meta` together with [lombok](http://projectlombok.org), the execution order may be quite random,
+and things may not work out. You'll have to `delombok` your project
+(see [this question on stackoverflow](http://stackoverflow.com/questions/29193806/specifying-order-of-annotation-processors) for details).
+
+
