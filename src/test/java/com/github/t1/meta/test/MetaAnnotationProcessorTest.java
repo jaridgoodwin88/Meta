@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 
-import org.junit.Test;
+import org.assertj.core.api.JUnitSoftAssertions;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -21,10 +22,15 @@ import com.github.t1.exap.*;
 import com.github.t1.exap.reflection.Message;
 import com.github.t1.meta.*;
 
+import lombok.Value;
+
 @RunWith(MockitoJUnitRunner.class)
 public class MetaAnnotationProcessorTest {
     @Mock
     Round round;
+
+    @Rule
+    public JUnitSoftAssertions softly = new JUnitSoftAssertions();
 
     MetaAnnotationProcessor processor = new MetaAnnotationProcessor();
 
@@ -50,12 +56,13 @@ public class MetaAnnotationProcessorTest {
         return new String(Files.readAllBytes(path));
     }
 
+    @Value
     static class Nested {
         boolean someBooleanProperty;
     }
 
-    @GenerateMeta
     @JavaDoc("pojo javadoc")
+    // not @GenerateMeta: we have compile errors here that we want to check for and we call manually
     static class Pojo {
         @JavaDoc("public value javadoc")
         public String publicValue;
@@ -64,7 +71,8 @@ public class MetaAnnotationProcessorTest {
 
         @SuppressWarnings("unused")
         private boolean ungettable;
-        // Nested nested;
+
+        public Nested nested;
 
         public int getIntValueWithGetter() {
             return intValueWithGetter;
@@ -85,14 +93,17 @@ public class MetaAnnotationProcessorTest {
 
         processor.process(round);
 
-        assertThat(created("$PojoProperties")) //
-                .isEqualTo(sourceOf(MetaAnnotationProcessorTest$PojoProperties.class));
-        assertThat(ENV.getMessages()).containsExactly( //
+        softly.assertThat(created("_PojoProperties")) //
+                .isEqualTo(sourceOf(MetaAnnotationProcessorTest_PojoProperties.class));
+        softly.assertThat(created("_NestedProperties")) //
+                .isEqualTo(sourceOf(MetaAnnotationProcessorTest_NestedProperties.class));
+        softly.assertThat(ENV.getMessages()).containsExactly( //
                 new Message(ENV.type(Pojo.class).getMethod("getUngettable"), WARNING,
                         "looks like a getter for field ungettable but it has the wrong return type"), //
                 new Message(ENV.type(Pojo.class).getField("ungettable"), ERROR,
                         "No matching getter found. Make the field public; " //
                                 + "or add a public getter method 'getUngettable()'; " //
+                                + "or add a public 'is' method 'isUngettable()'; " //
                                 + "or a fluent public getter method 'ungettable()'.") //
         );
     }

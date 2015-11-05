@@ -54,9 +54,13 @@
                     <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
                     <!-- the annotation processor itself has not yet been built, but we need lombok: -->
-                    <annotationProcessors>
-                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
-                    </annotationProcessors>
+                    <compilerArguments>
+                        <processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
+                    </compilerArguments>
+                    <!-- for the tests, it has been built, so we can add it to lombok: -->
+                    <testCompilerArguments>
+                        <processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor,com.github.t1.meta.MetaAnnotationProcessor</processor>
+                    </testCompilerArguments>
                 </configuration>
             </plugin>
             <plugin>

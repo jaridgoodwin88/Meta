@@ -1,28 +1,39 @@
 package com.github.t1.meta.test;
 
+import static com.github.t1.meta.test.ReadmeTest_CustomerProperties.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.*;
 
+import com.github.t1.meta.GenerateMeta;
+
+/** This is the sample code for the README.md */
 public class ReadmeTest {
-    class Customer {
-        Address address;
+    @GenerateMeta
+    public class Customer {
+        public Address address;
     }
 
-    class Address {
-        String street;
+    public class Address {
+        public String street;
+    }
+
+    Customer customer = new Customer();
+
+    @Before
+    public void setup() {
+        customer.address = new Address();
+        customer.address.street = "foo";
     }
 
     @Test
     public void shouldGetAddressViaReflection() throws Exception {
-        Customer customer = new Customer();
-        customer.address = new Address();
-        customer.address.street = "foo";
+        Optional<String> address = getAddressViaReflection(customer);
 
-        assertThat(getAddressViaReflection(customer)).contains("foo");
+        assertThat(address).contains("foo");
     }
 
     private Optional<String> getAddressViaReflection(Customer customer) throws ReflectiveOperationException {
@@ -37,5 +48,13 @@ public class ReadmeTest {
         streetField.setAccessible(true);
         String street = (String) streetField.get(address);
         return Optional.ofNullable(street);
+    }
+
+    @Test
+    public void shouldGetAddressViaMeta() {
+        // if you have compiler errors here, then the meta generator is not properly configured. see README.md
+        Optional<String> street = readmeTest_CustomerProperties().address().street().get(customer);
+
+        assertThat(street).contains("foo");
     }
 }
