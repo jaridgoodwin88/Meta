@@ -6,19 +6,19 @@ import java.util.function.Function;
 import com.github.t1.meta.*;
 import com.github.t1.meta.test.MetaAnnotationProcessorTest.Pojo;
 
-public class MetaAnnotationProcessorTest$PojoProperties<B> {
-    public static MetaAnnotationProcessorTest$PojoProperties<Pojo> metaAnnotationProcessorTest$PojoProperties() {
-        return new MetaAnnotationProcessorTest$PojoProperties<>(source -> Optional.ofNullable(source));
+public class MetaAnnotationProcessorTest_PojoProperties<B> {
+    public static MetaAnnotationProcessorTest_PojoProperties<Pojo> metaAnnotationProcessorTest_PojoProperties() {
+        return new MetaAnnotationProcessorTest_PojoProperties<>(source -> Optional.ofNullable(source));
     }
 
     private final Function<B, Optional<Pojo>> backtrack;
 
-    public MetaAnnotationProcessorTest$PojoProperties(Function<B, Optional<Pojo>> backtrack) {
+    public MetaAnnotationProcessorTest_PojoProperties(Function<B, Optional<Pojo>> backtrack) {
         this.backtrack = backtrack;
     }
 
     public String $id() {
-        return "metaAnnotationProcessorTest$Pojo";
+        return "metaAnnotationProcessorTest.Pojo";
     }
 
     public String $title() {
@@ -42,6 +42,12 @@ public class MetaAnnotationProcessorTest$PojoProperties<B> {
     public UriProperty<B> uriWithFluentGetter() {
         return new UriProperty<>("uriWithFluentGetter", "Uri With Fluent Getter", "",
                 source -> this.backtrack.apply(source).map(container -> container.uriWithFluentGetter()));
+    }
+
+    public MetaAnnotationProcessorTest_NestedProperties<B> nested() {
+        Function<B, Optional<MetaAnnotationProcessorTest.Nested>> backtrack =
+                source -> this.backtrack.apply(source).map(container -> container.nested);
+        return new MetaAnnotationProcessorTest_NestedProperties<>(backtrack);
     }
 
 }

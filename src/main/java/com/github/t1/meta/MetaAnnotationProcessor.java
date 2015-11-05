@@ -1,9 +1,9 @@
 package com.github.t1.meta;
 
+import static com.github.t1.meta.FieldPropertyGenerator.*;
 import static com.github.t1.meta.StringUtils.*;
 import static javax.lang.model.SourceVersion.*;
 
-import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -19,33 +19,32 @@ import lombok.extern.slf4j.Slf4j;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedAnnotationClasses({ GenerateMeta.class })
 public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
-    private static final Type STRING_PROPERTY = type(StringProperty.class);
-    private static final Type INTEGER_PROPERTY = type(IntegerProperty.class);
-    private static final Type BOOLEAN_PROPERTY = type(BooleanProperty.class);
-    private static final Type URI_PROPERTY = type(UriProperty.class);
-
-    private static Type type(Class<?> klass) {
-        return ReflectionProcessingEnvironment.ENV.type(klass);
-    }
-
     @Override
     public boolean process(Round round) {
-        for (Type pojoType : round.typesAnnotatedWith(GenerateMeta.class)) {
-            String typeName = pojoType.getRelativeName().replace('.', '_') + "Properties";
-            log.debug("generate {} from {}", typeName, pojoType.getFullName());
-            try (TypeGenerator type = pojoType.getPackage().openTypeGenerator(typeName)) {
-                type.addTypeParameter("B");
-                constructorMethod(pojoType, typeName, type);
-                FieldGenerator backtrackField = backtrackField(pojoType, type);
-                constructor(type, backtrackField);
-                metaProperties(pojoType, type);
-                fieldProperties(pojoType, type);
-            } catch (RuntimeException e) {
-                log.error("failed to process {}", pojoType.getFullName());
-                pojoType.error(MetaAnnotationProcessor.class.getName() + ": " + e.toString());
-            }
-        }
+        for (Type pojoType : round.typesAnnotatedWith(GenerateMeta.class))
+            metaTypeFor(pojoType);
         return false;
+    }
+
+    public String metaTypeFor(Type pojoType) {
+        String typeName = generatedTypeName(pojoType);
+        log.debug("generate {} from {}", typeName, pojoType.getFullName());
+        try (TypeGenerator generator = pojoType.getPackage().openTypeGenerator(typeName)) {
+            generator.addTypeParameter("B");
+            constructorMethod(pojoType, typeName, generator);
+            FieldGenerator backtrackField = backtrackField(pojoType, generator);
+            constructor(generator, backtrackField);
+            metaProperties(pojoType, generator);
+            fieldProperties(pojoType, generator);
+        } catch (RuntimeException e) {
+            log.error("failed to process {}", pojoType.getFullName());
+            pojoType.error(MetaAnnotationProcessor.class.getName() + ": " + e.toString());
+        }
+        return typeName;
+    }
+
+    private String generatedTypeName(Type pojoType) {
+        return pojoType.getRelativeName().replace('.', '_') + "Properties";
     }
 
     private void constructorMethod(Type pojoType, String typeName, TypeGenerator type) {
@@ -83,75 +82,12 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
     private String description(Type pojoType) {
         if (pojoType.isAnnotated(JavaDoc.class))
             return pojoType.getAnnotation(JavaDoc.class).value();
-        return camelToTitle(pojoType.getSimpleName());
-    }
-
-    private void fieldProperties(Type pojoType, TypeGenerator type) {
-        for (Field field : pojoType.getAllFields()) {
-            Type propertyType = propertyType(field.getType());
-            String getter = getterFor(pojoType, field);
-            if (getter == null)
-                continue;
-            type.addMethod(field.getName()) //
-                    .body("return new " + propertyType.getSimpleName() + "<>(" //
-                            + "\"" + field.getName() + "\", " //
-                            + "\"" + propertyTitle(field) + "\", " //
-                            + "\"" + propertyDescription(field) + "\",\n" //
-                            + "                source -> this.backtrack.apply(source).map(container -> container."
-                            + getter + "));") //
-                    .returnType(propertyType).typeVar("B");
-        }
-    }
-
-    private Type propertyType(Type type) {
-        if (type.isString())
-            return STRING_PROPERTY;
-        if (type.isBoolean())
-            return BOOLEAN_PROPERTY;
-        if (type.isInteger())
-            return INTEGER_PROPERTY;
-        if (type.isA(URI.class))
-            return URI_PROPERTY;
-        throw new UnsupportedOperationException("properties of type '" + type.getFullName() + "' not implemented, yet");
-    }
-
-    private String getterFor(Type pojoType, Field field) {
-        if (field.isPublic())
-            return field.getName();
-
-        String getter = "get" + initUpper(field.getName());
-        if (hasGettingMethod(pojoType, field, getter))
-            return getter + "()";
-
-        String fluentGetter = field.getName();
-        if (hasGettingMethod(pojoType, field, fluentGetter))
-            return fluentGetter + "()";
-
-        field.error("No matching getter found. Make the field public; " //
-                + "or add a public getter method '" + getter + "()'; " //
-                + "or a fluent public getter method '" + fluentGetter + "()'.");
-        return null;
-    }
-
-    private String propertyTitle(Field field) {
-        return camelToTitle(field.getName());
-    }
-
-    private String propertyDescription(Field field) {
-        if (field.isAnnotated(JavaDoc.class))
-            return field.getAnnotation(JavaDoc.class).value();
         return "";
     }
 
-    private boolean hasGettingMethod(Type pojoType, Field field, String getter) {
-        if (!pojoType.hasMethod(getter))
-            return false;
-        Method method = pojoType.getMethod(getter);
-        if (!method.getParameters().isEmpty())
-            return false;
-        if (method.getReturnType().isA(field.getType()))
-            return true;
-        method.warning("looks like a getter for field " + field.getName() + " but it has the wrong return type");
-        return false;
+    private void fieldProperties(Type pojoType, TypeGenerator generator) {
+        for (Field field : pojoType.getAllFields()) {
+            new FieldPropertyGenerator(this, field).addTo(generator);
+        }
     }
 }
