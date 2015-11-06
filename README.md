@@ -52,6 +52,8 @@ For Eclipse, you can generally enable annotation processing in the `Project Prop
 and set the `Generated Source Directory` to `target/generated-test-sources/test-annotations`. To enable `meta`, go to
 `Project Properties -> Java Compiler -> Annotation Processing -> Factory Path` and add a variable
 `M2_REPO/com/github/t1/meta/<version>/meta-<version>.jar`, where `<version>` is the current version of `meta`.
+Now all changes to your source is directly compiled within the IDE and any errors or warnings show up as
+APT problems.
 
 ## Lobok
 
