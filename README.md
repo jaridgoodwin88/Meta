@@ -55,8 +55,14 @@ and set the `Generated Source Directory` to `target/generated-test-sources/test-
 
 ## Lobok
 
-If you use `meta` together with [lombok](http://projectlombok.org), the execution order may be quite random,
-and things may not work out. You'll have to `delombok` your project
-(see [this question on stackoverflow](http://stackoverflow.com/questions/29193806/specifying-order-of-annotation-processors) for details).
+Normally, annotation processors can intermix freely, as the source produced by one annotation processor
+can be consumed by the next, taking an arbitrary number of rounds. [Lombok](http://projectlombok.org) is
+different, though, as it modifies existing byte-code; this makes the execution order relevant, but there is
+no way to specify it... allegedly it's even depends on a hash map, making it quite random.
+
+So if you depend on lombok to generate the accessors for `meta` to use, you may have to
+[delombok](https://projectlombok.org/features/delombok.html) your project.
+
+See [this question on stackoverflow](http://stackoverflow.com/questions/29193806/specifying-order-of-annotation-processors) for details.
 
 
