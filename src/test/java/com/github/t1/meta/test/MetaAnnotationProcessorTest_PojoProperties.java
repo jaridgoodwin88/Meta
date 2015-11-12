@@ -1,6 +1,6 @@
 package com.github.t1.meta.test;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import com.github.t1.meta.*;
@@ -27,6 +27,10 @@ public class MetaAnnotationProcessorTest_PojoProperties<B> {
 
     public String $description() {
         return "pojo javadoc";
+    }
+
+    public List<Property<?, B>> $properties() {
+        return Arrays.asList(publicValue(), intValueWithGetter(), uriWithFluentGetter());
     }
 
     public StringProperty<B> publicValue() {

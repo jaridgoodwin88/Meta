@@ -25,7 +25,7 @@ public class FieldPropertyGenerator {
     private final Field field;
 
     public void addTo(TypeGenerator typeGenerator) {
-        String getter = getter();
+        String getter = getter(true);
         if (getter == null)
             return;
         Type propertyType = propertyType();
@@ -42,30 +42,35 @@ public class FieldPropertyGenerator {
         }
     }
 
-    private String getter() {
+    public String getter() {
+        return getter(false);
+    }
+
+    private String getter(boolean generateErrorsAndWarnings) {
         if (field.isPublic())
             return field.getName();
 
         String getter = "get" + initUpper(field.getName());
-        if (hasGettingMethod(getter))
+        if (hasGettingMethod(getter, generateErrorsAndWarnings))
             return getter + "()";
 
         String iser = field.getType().isBoolean() ? "is" + initUpper(field.getName()) : null;
-        if (iser != null && hasGettingMethod(iser))
+        if (iser != null && hasGettingMethod(iser, generateErrorsAndWarnings))
             return iser + "()";
 
         String fluentGetter = field.getName();
-        if (hasGettingMethod(fluentGetter))
+        if (hasGettingMethod(fluentGetter, generateErrorsAndWarnings))
             return fluentGetter + "()";
 
-        field.error("No matching getter found. Make the field public; " //
-                + "or add a public getter method '" + getter + "()'; " //
-                + ((iser == null) ? "" : ("or add a public 'is' method '" + iser + "()'; ")) //
-                + "or a fluent public getter method '" + fluentGetter + "()'.");
+        if (generateErrorsAndWarnings)
+            field.error("No matching getter found. Make the field public; " //
+                    + "or add a public getter method '" + getter + "()'; " //
+                    + ((iser == null) ? "" : ("or add a public 'is' method '" + iser + "()'; ")) //
+                    + "or a fluent public getter method '" + fluentGetter + "()'.");
         return null;
     }
 
-    private boolean hasGettingMethod(String getter) {
+    private boolean hasGettingMethod(String getter, boolean generateErrorsAndWarnings) {
         Type declaringType = field.getDeclaringType();
         if (!declaringType.hasMethod(getter))
             return false;
@@ -74,11 +79,12 @@ public class FieldPropertyGenerator {
             return false;
         if (method.getReturnType().isA(field.getType()))
             return true;
-        method.warning("looks like a getter for field " + field.getName() + " but it has the wrong return type");
+        if (generateErrorsAndWarnings)
+            method.warning("looks like a getter for field " + field.getName() + " but it has the wrong return type");
         return false;
     }
 
-    private Type propertyType() {
+    public Type propertyType() {
         Type type = field.getType();
         if (type.isString())
             return STRING_PROPERTY;

@@ -1,9 +1,9 @@
 package com.github.t1.meta.test;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
-import com.github.t1.meta.BooleanProperty;
+import com.github.t1.meta.*;
 import com.github.t1.meta.test.MetaAnnotationProcessorTest.Nested;
 
 public class MetaAnnotationProcessorTest_NestedProperties<B> {
@@ -27,6 +27,10 @@ public class MetaAnnotationProcessorTest_NestedProperties<B> {
 
     public String $description() {
         return "";
+    }
+
+    public List<Property<?, B>> $properties() {
+        return Arrays.asList(someBooleanProperty());
     }
 
     public BooleanProperty<B> someBooleanProperty() {

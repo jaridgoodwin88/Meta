@@ -4,7 +4,7 @@ import static com.github.t1.meta.FieldPropertyGenerator.*;
 import static com.github.t1.meta.StringUtils.*;
 import static javax.lang.model.SourceVersion.*;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.annotation.processing.SupportedSourceVersion;
@@ -23,6 +23,7 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
     public boolean process(Round round) {
         for (Type pojoType : round.typesAnnotatedWith(GenerateMeta.class))
             metaTypeFor(pojoType);
+
         return false;
     }
 
@@ -73,6 +74,7 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
         stringMethod(type, "$id", initLower(pojoType.getRelativeName()));
         stringMethod(type, "$title", camelToTitle(pojoType.getSimpleName()));
         stringMethod(type, "$description", description(pojoType));
+        propertiesMethod(pojoType, type);
     }
 
     private void stringMethod(TypeGenerator type, String name, String result) {
@@ -89,5 +91,23 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
         for (Field field : pojoType.getAllFields()) {
             new FieldPropertyGenerator(this, field).addTo(generator);
         }
+    }
+
+    private void propertiesMethod(Type pojoType, TypeGenerator type) {
+        type.addImport(type(List.class)).addImport(type(Arrays.class)).addImport(type(Property.class));
+        StringBuilder body = new StringBuilder();
+        body.append("return Arrays.asList(");
+        Delimiter delimiter = new Delimiter(", ");
+        for (Field field : pojoType.getAllFields())
+            if (isProperty(field))
+                body.append(delimiter.next()).append(field.getName()).append("()");
+        body.append(");");
+
+        type.addMethod("$properties").body(body.toString()).returnType("List<Property<?, B>>");
+    }
+
+    private boolean isProperty(Field field) {
+        FieldPropertyGenerator propertyGenerator = new FieldPropertyGenerator(this, field);
+        return propertyGenerator.getter() != null && propertyGenerator.propertyType() != null;
     }
 }
