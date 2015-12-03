@@ -95,13 +95,10 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
 
     private void propertiesMethod(Type pojoType, TypeGenerator type) {
         type.addImport(type(List.class)).addImport(type(Arrays.class)).addImport(type(Property.class));
-        StringBuilder body = new StringBuilder();
-        body.append("return Arrays.asList(");
-        Delimiter delimiter = new Delimiter(", ");
+        StringJoiner body = new StringJoiner(", ", "return Arrays.asList(", ");");
         for (Field field : pojoType.getAllFields())
             if (isProperty(field))
-                body.append(delimiter.next()).append(field.getName()).append("()");
-        body.append(");");
+                body.add(field.getName() + "()");
 
         type.addMethod("$properties").body(body.toString()).returnType("List<Property<?, B>>");
     }
