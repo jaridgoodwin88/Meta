@@ -1,6 +1,6 @@
 # Meta
 
-A typesafe meta model for Java.
+A typesafe meta model for Java and representations for other data formats.
 
 ## Example
 
@@ -10,13 +10,15 @@ Say you have these classes:
     class Customer {
         Address address;
     }
-    
+
     class Address {
         String street;
     }
 ```
 
-To get an Optional for the street, using reflection, you'll have to write:
+### Classic Reflection
+
+To get an Optional for the street of a customer, using java reflection, you have to write:
 
 ```java
     Customer customer = ...
@@ -33,7 +35,10 @@ To get an Optional for the street, using reflection, you'll have to write:
     return Optional.ofNullable(street);
 ```
 
-With this project, you can write:
+It's a lot of code, and it's not typesafe, i.e. the compiler won't tell you, if you try to access
+the street as a number.
+
+### Typesafe Properties
 
 ```java
     Customer customer = ...
@@ -46,7 +51,7 @@ This is not only less code to read, it's also typesafe and refactoring-safe.
 
 ## Setup
 
-For maven/gradle/etc., it's trivial: Just include a dependency on `com.github.t1:meta` and you're ready to go. 
+For maven/gradle/etc., it's trivial: Just include a dependency on `com.github.t1:meta` and you're ready to go.
 
 For Eclipse, you can generally enable annotation processing in the `Project Properties -> Java Compiler -> Annotation Processing`
 and set the `Generated Source Directory` to `target/generated-test-sources/test-annotations`. To enable `meta`, go to
@@ -68,3 +73,10 @@ So if you depend on lombok to generate the accessors for `meta` to use, you may 
 See [this question on stackoverflow](http://stackoverflow.com/questions/29193806/specifying-order-of-annotation-processors) for details.
 
 
+## Principles
+
+Data consists of scalars (atomic types), sequences (repeated values), and mappings (a sequence of key-value pairs).
+Data can be represented in various formats, pojos, collections, or xml, json, or yaml documents, to name just a few.
+All of these formats have some meta data, like whitespace, comments, type information, distinction between attributes
+and elements, read-only flags, and much more.
+While all data formats should be able to represent all data, meta data is often specific to one such representation and invalid in others.
