@@ -1,5 +1,5 @@
 package com.github.t1.meta2;
 
-public interface Sequence {
-
+public interface Sequence<B> {
+    int size(B object);
 }

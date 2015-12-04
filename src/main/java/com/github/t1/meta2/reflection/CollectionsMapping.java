@@ -1,7 +1,6 @@
 package com.github.t1.meta2.reflection;
 
-import static com.github.t1.meta2.StructureKind.*;
-
+import java.lang.reflect.Array;
 import java.util.*;
 
 import com.github.t1.meta2.*;
@@ -18,44 +17,49 @@ public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> 
     private CollectionsMapping(Map<String, ?> map) {
         this.properties = new LinkedHashMap<>();
         for (String name : map.keySet())
-            properties.put(name, new MapProperty<>(name));
+            properties.put(name, new MapProperty<>(map.get(name).getClass(), name));
     }
 
-    @Override
-    public Scalar<B> getScalar(String name) {
-        if (!properties.containsKey(name))
-            throw new IllegalArgumentException("property " + name + " not found in map");
-        return new StringScalar<>(name);
-    }
-
-    @RequiredArgsConstructor
-    private static class MapProperty<B extends Map<String, ?>> implements Mapping.Property<B> {
+    @ToString
+    private static class MapProperty<B extends Map<String, ?>> extends ObjectProperty<B> {
+        @Getter
         private final String name;
 
-        @Override
-        public String getName() {
-            return name;
+        public MapProperty(Class<?> type, String name) {
+            super(type);
+            this.name = name;
         }
 
         @Override
-        public Scalar<B> getScalarValue() {
-            return new StringScalar<>(name);
+        public Scalar<B> createScalar() {
+            return new MapScalar<>(name);
         }
 
         @Override
-        public StructureKind getKind() {
-            return scalar;
+        public Sequence<B> createSequence() {
+            return new MapSequence<>(name);
         }
     }
 
     @RequiredArgsConstructor
-    private static class StringScalar<B extends Map<String, ?>> extends ObjectScalar<B> {
+    private static class MapScalar<B extends Map<String, ?>> extends ObjectScalar<B> {
         @Getter
         private final String name;
 
         @Override
         protected Object get(B map) {
             return map.get(name);
+        }
+    }
+
+    @RequiredArgsConstructor
+    private static class MapSequence<B extends Map<String, ?>> implements Sequence<B> {
+        @Getter
+        private final String name;
+
+        @Override
+        public int size(B map) {
+            return Array.getLength(map.get(name));
         }
     }
 

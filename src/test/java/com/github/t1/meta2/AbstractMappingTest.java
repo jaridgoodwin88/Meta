@@ -1,10 +1,15 @@
 package com.github.t1.meta2;
 
 import static com.github.t1.meta2.StructureKind.*;
+import static com.github.t1.meta2.reflection.ObjectProperty.*;
+import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
+import org.assertj.core.api.Condition;
 import org.junit.Test;
 
 import com.github.t1.meta2.Mapping.Property;
@@ -21,6 +26,9 @@ public abstract class AbstractMappingTest<B> {
     public static final float FLOAT_VALUE = 12.34f;
     public static final double DOUBLE_VALUE = 12.3456d;
 
+    public static final int[] INT_ARRAY_VALUE = { 1, 2, 3, 4, 5 };
+    public static final List<Integer> INT_LIST_VALUE = IntStream.of(INT_ARRAY_VALUE).boxed().collect(toList());
+
     protected abstract B createObject();
 
     protected abstract Mapping<B> createMapping();
@@ -29,86 +37,12 @@ public abstract class AbstractMappingTest<B> {
 
     Mapping<B> mapping = createMapping();
 
-    private static final Class<?>[] SCALAR_TYPES = { Boolean.class, Character.class, Byte.class, Short.class,
-            Integer.class, Long.class, Float.class, Double.class, String.class };
-
-    @SuppressWarnings("unchecked")
-    private <T> void assertGettingScalar(T expectedValue, Scalar<B> scalarValue) {
-        for (Class<?> scalarType : SCALAR_TYPES)
-            if (scalarType == String.class)
-                assertThat(scalarValue.get(object, String.class)).contains(expectedValue.toString());
-            else if (scalarType.isInstance(expectedValue))
-                assertThat(scalarValue.get(object, (Class<T>) scalarType)).contains(expectedValue);
-            else
-                assertThatThrownBy(() -> scalarValue.get(object, scalarType)).isInstanceOf(ClassCastException.class);
-    }
-
-    @Test
-    public void shouldGetStringPropertyOfObject() {
-        testProperty("stringProperty", STRING_VALUE);
-    }
-
-    @Test
-    public void shouldGetBooleanPropertyOfObject() {
-        testProperty("booleanProperty", BOOLEAN_VALUE);
-    }
-
-    @Test
-    public void shouldGetCharPropertyOfObject() {
-        testProperty("charProperty", CHARACTER_VALUE);
-    }
-
-    @Test
-    public void shouldGetBytePropertyOfObject() {
-        testProperty("byteProperty", BYTE_VALUE);
-    }
-
-    @Test
-    public void shouldGetShortPropertyOfObject() {
-        testProperty("shortProperty", SHORT_VALUE);
-    }
-
-    @Test
-    public void shouldGetIntPropertyOfObject() {
-        testProperty("intProperty", INT_VALUE);
-    }
-
-    @Test
-    public void shouldGetIntegerPropertyOfObject() {
-        testProperty("integerProperty", INTEGER_VALUE);
-    }
-
-    @Test
-    public void shouldGetLongPropertyOfObject() {
-        testProperty("longProperty", LONG_VALUE);
-    }
-
-    @Test
-    public void shouldGetFloatPropertyOfObject() {
-        testProperty("floatProperty", FLOAT_VALUE);
-    }
-
-    @Test
-    public void shouldGetDoublePropertyOfObject() {
-        testProperty("doubleProperty", DOUBLE_VALUE);
-    }
-
-    private <T> void testProperty(String name, T expectedValue) {
-        Property<B> property = mapping.getProperty(name);
-
-        assertThat(property).isNotNull();
-        assertThat(property.getName()).isEqualTo(name);
-        Scalar<B> scalarValue = property.getScalarValue();
-
-        assertThat(scalarValue.get(object, String.class)).contains(expectedValue.toString());
-        assertGettingScalar(expectedValue, scalarValue);
-    }
 
     @Test
     public void shouldGetProperties() {
         List<Property<B>> properties = mapping.getProperties();
 
-        assertThat(properties) //
+        then(properties) //
                 .extracting(property -> tuple(property.getName(), property.getKind())) //
                 .containsExactly( //
                         tuple("stringProperty", scalar), //
@@ -120,7 +54,124 @@ public abstract class AbstractMappingTest<B> {
                         tuple("integerProperty", scalar), //
                         tuple("longProperty", scalar), //
                         tuple("floatProperty", scalar), //
-                        tuple("doubleProperty", scalar) //
+                        tuple("doubleProperty", scalar), //
+                        //
+                        tuple("intArrayProperty", sequence) //
         );
+    }
+
+
+    private Property<B> whenGetProperty(String name) {
+        Property<B> property = mapping.getProperty(name);
+
+        then(property).isNotNull();
+        then(property.getName()).isEqualTo(name);
+
+        return property;
+    }
+
+    @Test
+    public void shouldGetStringProperty() {
+        Property<B> property = whenGetProperty("stringProperty");
+
+        then(property.getScalar()).is(validScalar(STRING_VALUE));
+    }
+
+    @Test
+    public void shouldGetBooleanProperty() {
+        Property<B> property = whenGetProperty("booleanProperty");
+
+        then(property.getScalar()).is(validScalar(BOOLEAN_VALUE));
+    }
+
+    @Test
+    public void shouldGetCharProperty() {
+        Property<B> property = whenGetProperty("charProperty");
+
+        then(property.getScalar()).is(validScalar(CHARACTER_VALUE));
+    }
+
+    @Test
+    public void shouldGetByteProperty() {
+        Property<B> property = whenGetProperty("byteProperty");
+
+        then(property.getScalar()).is(validScalar(BYTE_VALUE));
+    }
+
+    @Test
+    public void shouldGetShortProperty() {
+        Property<B> property = whenGetProperty("shortProperty");
+
+        then(property.getScalar()).is(validScalar(SHORT_VALUE));
+    }
+
+    @Test
+    public void shouldGetIntProperty() {
+        Property<B> property = whenGetProperty("intProperty");
+
+        then(property.getScalar()).is(validScalar(INT_VALUE));
+    }
+
+    @Test
+    public void shouldGetIntegerProperty() {
+        Property<B> property = whenGetProperty("integerProperty");
+
+        then(property.getScalar()).is(validScalar(INTEGER_VALUE));
+    }
+
+    @Test
+    public void shouldGetLongProperty() {
+        Property<B> property = whenGetProperty("longProperty");
+
+        then(property.getScalar()).is(validScalar(LONG_VALUE));
+    }
+
+    @Test
+    public void shouldGetFloatProperty() {
+        Property<B> property = whenGetProperty("floatProperty");
+
+        then(property.getScalar()).is(validScalar(FLOAT_VALUE));
+    }
+
+    @Test
+    public void shouldGetDoubleProperty() {
+        Property<B> property = whenGetProperty("doubleProperty");
+
+        then(property.getScalar()).is(validScalar(DOUBLE_VALUE));
+    }
+
+
+    private <T> Condition<Scalar<B>> validScalar(T expectedValue) {
+        return new Condition<>(scalar -> scalarPredicate(scalar, expectedValue), "");
+    }
+
+    private <T> boolean scalarPredicate(Scalar<B> scalar, T expectedValue) {
+        then(scalar.get(object, String.class)).contains(expectedValue.toString());
+        for (Class<?> scalarType : PRIMITIVE_WRAPPER_SCALARS)
+            if (scalarType.isInstance(expectedValue)) {
+                @SuppressWarnings("unchecked")
+                Class<T> scalarT = (Class<T>) scalarType;
+                then(scalar.get(object, scalarT)).contains(expectedValue);
+            } else {
+                thenThrownBy(() -> scalar.get(object, scalarType))
+                        .isInstanceOf(ClassCastException.class);
+            }
+        return true; // dummy return value... actually we use nested asserts
+    }
+
+    @Test
+    public void shouldGetIntSequenceProperty() {
+        Property<B> property = whenGetProperty("intArrayProperty");
+
+        then(property.getSequence()).is(validSequence(INT_LIST_VALUE));
+    }
+
+    private <T> Condition<Sequence<B>> validSequence(List<T> expectedValue) {
+        return new Condition<>(sequence -> sequencePredicate(sequence, expectedValue), "");
+    }
+
+    private <T> boolean sequencePredicate(Sequence<B> sequence, List<T> expectedValue) {
+        then(sequence.size(object)).isEqualTo(expectedValue.size());
+        return true; // dummy return value... actually we use nested asserts
     }
 }

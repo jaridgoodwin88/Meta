@@ -3,7 +3,8 @@ package com.github.t1.meta2;
 import com.github.t1.meta2.reflection.ReflectionMapping;
 
 public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.ReflectionTest.Pojo> {
-
+    // TODO ignore static fields
+    // TODO ignore transient fields
 
     public static class Pojo {
         String stringProperty = STRING_VALUE;
@@ -16,6 +17,8 @@ public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.Refl
         long longProperty = LONG_VALUE;
         float floatProperty = FLOAT_VALUE;
         double doubleProperty = DOUBLE_VALUE;
+
+        int[] intArrayProperty = INT_ARRAY_VALUE;
     }
 
     @Override

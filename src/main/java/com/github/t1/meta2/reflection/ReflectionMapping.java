@@ -1,8 +1,6 @@
 package com.github.t1.meta2.reflection;
 
-import static com.github.t1.meta2.StructureKind.*;
-
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.*;
 
 import com.github.t1.meta2.*;
@@ -22,9 +20,14 @@ public class ReflectionMapping<B> implements Mapping<B> {
             properties.put(field.getName(), new FieldReflectionProperty<>(field));
     }
 
-    @RequiredArgsConstructor
-    private static class FieldReflectionProperty<B> implements Property<B> {
+    @ToString
+    private static class FieldReflectionProperty<B> extends ObjectProperty<B> {
         private final Field field;
+
+        public FieldReflectionProperty(Field field) {
+            super(field.getType());
+            this.field = field;
+        }
 
         @Override
         public String getName() {
@@ -32,13 +35,13 @@ public class ReflectionMapping<B> implements Mapping<B> {
         }
 
         @Override
-        public Scalar<B> getScalarValue() {
+        public Scalar<B> createScalar() {
             return new FieldReflectionScalar<>(field);
         }
 
         @Override
-        public StructureKind getKind() {
-            return scalar;
+        public Sequence<B> createSequence() {
+            return new FieldReflectionSequence<>(field);
         }
     }
 
@@ -54,6 +57,21 @@ public class ReflectionMapping<B> implements Mapping<B> {
         @SneakyThrows(ReflectiveOperationException.class)
         protected Object get(Object object) {
             return field.get(object);
+        }
+    }
+
+    private static class FieldReflectionSequence<B> implements Sequence<B> {
+        private final Field field;
+
+        public FieldReflectionSequence(Field field) {
+            this.field = field;
+            this.field.setAccessible(true);
+        }
+
+        @Override
+        @SneakyThrows(ReflectiveOperationException.class)
+        public int size(B object) {
+            return Array.getLength(field.get(object));
         }
     }
 
