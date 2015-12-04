@@ -14,7 +14,9 @@ public class CollectionsTest extends AbstractMappingTest {
 
     @Override
     protected Mapping createMapping(Object object) {
-        return CollectionsMapping.of((Map<?, ?>) object);
+        @SuppressWarnings("unchecked")
+        Map<String, ?> map = (Map<String, ?>) object;
+        return CollectionsMapping.of(map);
     }
 
 }

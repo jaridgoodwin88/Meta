@@ -9,7 +9,6 @@ import lombok.SneakyThrows;
 
 class FieldReflectionScalar implements Scalar {
     private final Field field;
-    private Object object;
 
     public FieldReflectionScalar(Field field) {
         this.field = field;
@@ -17,19 +16,8 @@ class FieldReflectionScalar implements Scalar {
     }
 
     @Override
-    public String getName() {
-        return field.getName();
-    }
-
-    @Override
-    public FieldReflectionScalar attach(Object object) {
-        this.object = object;
-        return this;
-    }
-
-    @Override
     @SneakyThrows(ReflectiveOperationException.class)
-    public Optional<String> getStringValue() {
+    public Optional<String> getStringValue(Object object) {
         return Optional.ofNullable(field.get(object)).map(value -> value.toString());
     }
 }

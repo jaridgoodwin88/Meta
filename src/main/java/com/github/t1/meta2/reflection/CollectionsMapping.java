@@ -6,17 +6,33 @@ import com.github.t1.meta2.*;
 
 import lombok.*;
 
-@AllArgsConstructor
 public class CollectionsMapping implements Mapping {
-    public static CollectionsMapping of(Map<?, ?> map) {
+    public static CollectionsMapping of(Map<String, ?> map) {
         return new CollectionsMapping(map);
     }
 
-    private Map<?, ?> map;
+    private final Map<String, Property> properties;
+
+    private CollectionsMapping(Map<String, ?> map) {
+        this.properties = new LinkedHashMap<>();
+        for (String name : map.keySet()) {
+            properties.put(name, new Mapping.Property() {
+                @Override
+                public String getName() {
+                    return name;
+                }
+
+                @Override
+                public Scalar getScalarValue() {
+                    return new StringScalar(name);
+                }
+            });
+        }
+    }
 
     @Override
     public Scalar getScalar(String name) {
-        if (!map.containsKey(name))
+        if (!properties.containsKey(name))
             throw new IllegalArgumentException("property " + name + " not found in map");
         return new StringScalar(name);
     }
@@ -25,17 +41,24 @@ public class CollectionsMapping implements Mapping {
     public class StringScalar implements Scalar {
         @Getter
         private final String name;
-        @Getter
-        private Optional<String> stringValue;
 
         @Override
-        public StringScalar attach(Object object) {
+        public Optional<String> getStringValue(Object object) {
             @SuppressWarnings("unchecked")
-            Map<String, String> map = (Map<String, String>) object;
-            this.stringValue = Optional.ofNullable(map.get(name));
-            return this;
+            Map<String, Object> map = (Map<String, Object>) object;
+            return Optional.ofNullable(map.get(name)).map(value -> value.toString());
         }
 
+    }
+
+    @Override
+    public List<Property> getProperties() {
+        return new ArrayList<>(properties.values());
+    }
+
+    @Override
+    public Property getProperty(String name) {
+        return properties.get(name);
     }
 
 }
