@@ -88,9 +88,8 @@ public class MetaAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void fieldProperties(Type pojoType, TypeGenerator generator) {
-        for (Field field : pojoType.getAllFields()) {
+        for (Field field : pojoType.getAllFields())
             new FieldPropertyGenerator(this, field).addTo(generator);
-        }
     }
 
     private void propertiesMethod(Type pojoType, TypeGenerator type) {

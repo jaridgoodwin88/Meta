@@ -49,15 +49,14 @@ public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> 
     }
 
     @RequiredArgsConstructor
-    private static class StringScalar<B extends Map<String, ?>> implements Scalar<B> {
+    private static class StringScalar<B extends Map<String, ?>> extends ObjectScalar<B> {
         @Getter
         private final String name;
 
         @Override
-        public Optional<String> getStringValue(B map) {
-            return Optional.ofNullable(map.get(name)).map(value -> value.toString());
+        protected Object get(B map) {
+            return map.get(name);
         }
-
     }
 
     @Override

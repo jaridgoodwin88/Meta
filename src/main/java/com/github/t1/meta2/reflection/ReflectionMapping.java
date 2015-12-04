@@ -9,14 +9,14 @@ import com.github.t1.meta2.*;
 
 import lombok.*;
 
-public class Reflect<B> implements Mapping<B> {
-    public static <B> Reflect<B> on(Class<B> type) {
-        return new Reflect<>(type);
+public class ReflectionMapping<B> implements Mapping<B> {
+    public static <B> ReflectionMapping<B> on(Class<B> type) {
+        return new ReflectionMapping<>(type);
     }
 
     private final Map<String, FieldReflectionProperty<B>> properties;
 
-    private Reflect(Class<?> type) {
+    private ReflectionMapping(Class<?> type) {
         this.properties = new LinkedHashMap<>();
         for (Field field : type.getDeclaredFields())
             properties.put(field.getName(), new FieldReflectionProperty<>(field));
@@ -24,7 +24,7 @@ public class Reflect<B> implements Mapping<B> {
 
     @RequiredArgsConstructor
     private static class FieldReflectionProperty<B> implements Property<B> {
-        final Field field;
+        private final Field field;
 
         @Override
         public String getName() {
@@ -42,7 +42,7 @@ public class Reflect<B> implements Mapping<B> {
         }
     }
 
-    private static class FieldReflectionScalar<B> implements Scalar<B> {
+    private static class FieldReflectionScalar<B> extends ObjectScalar<B> {
         private final Field field;
 
         public FieldReflectionScalar(Field field) {
@@ -52,8 +52,8 @@ public class Reflect<B> implements Mapping<B> {
 
         @Override
         @SneakyThrows(ReflectiveOperationException.class)
-        public Optional<String> getStringValue(B object) {
-            return Optional.ofNullable(field.get(object)).map(value -> value.toString());
+        protected Object get(Object object) {
+            return field.get(object);
         }
     }
 

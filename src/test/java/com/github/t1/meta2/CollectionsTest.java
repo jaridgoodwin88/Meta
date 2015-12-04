@@ -8,7 +8,16 @@ public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
     @Override
     protected Map<String, Object> createObject() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("stringProperty", "stringValue");
+        map.put("stringProperty", STRING_VALUE);
+        map.put("booleanProperty", BOOLEAN_VALUE);
+        map.put("charProperty", CHARACTER_VALUE);
+        map.put("byteProperty", BYTE_VALUE);
+        map.put("shortProperty", SHORT_VALUE);
+        map.put("intProperty", INT_VALUE);
+        map.put("integerProperty", INTEGER_VALUE);
+        map.put("longProperty", LONG_VALUE);
+        map.put("floatProperty", FLOAT_VALUE);
+        map.put("doubleProperty", DOUBLE_VALUE);
         return map;
     }
 

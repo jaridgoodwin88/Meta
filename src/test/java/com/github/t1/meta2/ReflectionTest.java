@@ -1,13 +1,21 @@
 package com.github.t1.meta2;
 
-import com.github.t1.meta2.reflection.Reflect;
-
-import lombok.Data;
+import com.github.t1.meta2.reflection.ReflectionMapping;
 
 public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.ReflectionTest.Pojo> {
-    @Data
+
+
     public static class Pojo {
-        String stringProperty = "stringValue";
+        String stringProperty = STRING_VALUE;
+        boolean booleanProperty = BOOLEAN_VALUE;
+        char charProperty = CHARACTER_VALUE;
+        byte byteProperty = BYTE_VALUE;
+        short shortProperty = SHORT_VALUE;
+        int intProperty = INT_VALUE;
+        Integer integerProperty = INTEGER_VALUE;
+        long longProperty = LONG_VALUE;
+        float floatProperty = FLOAT_VALUE;
+        double doubleProperty = DOUBLE_VALUE;
     }
 
     @Override
@@ -16,7 +24,7 @@ public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.Refl
     }
 
     @Override
-    protected Reflect<Pojo> createMapping() {
-        return Reflect.on(Pojo.class);
+    protected ReflectionMapping<Pojo> createMapping() {
+        return ReflectionMapping.on(Pojo.class);
     }
 }
