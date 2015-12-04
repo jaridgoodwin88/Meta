@@ -1,5 +1,6 @@
 package com.github.t1.meta2;
 
+import static com.github.t1.meta2.StructureKind.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
@@ -8,19 +9,19 @@ import org.junit.Test;
 
 import com.github.t1.meta2.Mapping.Property;
 
-public abstract class AbstractMappingTest {
+public abstract class AbstractMappingTest<B> {
 
-    protected abstract Object createObject();
+    protected abstract B createObject();
 
-    protected abstract Mapping createMapping(Object object);
+    protected abstract Mapping<B> createMapping();
 
-    Object object = createObject();
+    B object = createObject();
 
-    Mapping mapping = createMapping(object);
+    Mapping<B> mapping = createMapping();
 
     @Test
     public void shouldGetPropertiesOfPojo() {
-        Property property = mapping.getProperty("stringProperty");
+        Property<B> property = mapping.getProperty("stringProperty");
         assertThat(property).isNotNull();
         assertThat(property.getName()).isEqualTo("stringProperty");
         assertThat(property.getScalarValue().getStringValue(object)).contains("stringValue");
@@ -28,8 +29,10 @@ public abstract class AbstractMappingTest {
 
     @Test
     public void shouldGetProperties() {
-        List<Property> properties = mapping.getProperties();
+        List<Property<B>> properties = mapping.getProperties();
 
-        assertThat(properties).extracting(property -> property.getName()).containsExactly("stringProperty");
+        assertThat(properties) //
+                .extracting(property -> tuple(property.getName(), property.getKind())) //
+                .containsExactly(tuple("stringProperty", scalar));
     }
 }

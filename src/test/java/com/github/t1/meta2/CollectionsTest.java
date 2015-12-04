@@ -4,19 +4,17 @@ import java.util.*;
 
 import com.github.t1.meta2.reflection.CollectionsMapping;
 
-public class CollectionsTest extends AbstractMappingTest {
+public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
     @Override
-    protected Object createObject() {
-        Map<String, String> map = new LinkedHashMap<>();
+    protected Map<String, Object> createObject() {
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("stringProperty", "stringValue");
         return map;
     }
 
     @Override
-    protected Mapping createMapping(Object object) {
-        @SuppressWarnings("unchecked")
-        Map<String, ?> map = (Map<String, ?>) object;
-        return CollectionsMapping.of(map);
+    protected Mapping<Map<String, Object>> createMapping() {
+        return CollectionsMapping.of(object);
     }
 
 }
