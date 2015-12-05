@@ -2,6 +2,7 @@ package com.github.t1.meta2;
 
 import static com.github.t1.meta2.StructureKind.*;
 import static com.github.t1.meta2.reflection.ObjectProperty.*;
+import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.BDDAssertions.*;
@@ -28,6 +29,7 @@ public abstract class AbstractMappingTest<B> {
 
     public static final int[] INT_ARRAY_VALUE = { 1, 2, 3, 4, 5 };
     public static final List<Integer> INT_LIST_VALUE = IntStream.of(INT_ARRAY_VALUE).boxed().collect(toList());
+    public static final List<String> STRING_LIST_VALUE = asList("one", "two", "three");
 
     protected abstract B createObject();
 
@@ -56,7 +58,9 @@ public abstract class AbstractMappingTest<B> {
                         tuple("floatProperty", scalar), //
                         tuple("doubleProperty", scalar), //
                         //
-                        tuple("intArrayProperty", sequence) //
+                        tuple("intArrayProperty", sequence), //
+                        tuple("intListProperty", sequence), //
+                        tuple("stringListProperty", sequence) //
         );
     }
 
@@ -160,8 +164,15 @@ public abstract class AbstractMappingTest<B> {
     }
 
     @Test
-    public void shouldGetIntSequenceProperty() {
+    public void shouldGetIntArrayProperty() {
         Property<B> property = whenGetProperty("intArrayProperty");
+
+        then(property.getSequence()).is(validSequence(INT_LIST_VALUE));
+    }
+
+    @Test
+    public void shouldGetIntegerListProperty() {
+        Property<B> property = whenGetProperty("intListProperty");
 
         then(property.getSequence()).is(validSequence(INT_LIST_VALUE));
     }

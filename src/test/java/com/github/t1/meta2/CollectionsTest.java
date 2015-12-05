@@ -20,6 +20,8 @@ public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
         map.put("doubleProperty", DOUBLE_VALUE);
 
         map.put("intArrayProperty", INT_ARRAY_VALUE);
+        map.put("intListProperty", INT_LIST_VALUE);
+        map.put("stringListProperty", STRING_LIST_VALUE);
         return map;
     }
 

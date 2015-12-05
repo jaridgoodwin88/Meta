@@ -1,11 +1,12 @@
 package com.github.t1.meta2;
 
+import java.util.List;
+
 import com.github.t1.meta2.reflection.ReflectionMapping;
 
 public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.ReflectionTest.Pojo> {
     // TODO ignore static fields
     // TODO ignore transient fields
-
     public static class Pojo {
         String stringProperty = STRING_VALUE;
         boolean booleanProperty = BOOLEAN_VALUE;
@@ -19,6 +20,8 @@ public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.Refl
         double doubleProperty = DOUBLE_VALUE;
 
         int[] intArrayProperty = INT_ARRAY_VALUE;
+        List<Integer> intListProperty = INT_LIST_VALUE;
+        List<String> stringListProperty = STRING_LIST_VALUE;
     }
 
     @Override

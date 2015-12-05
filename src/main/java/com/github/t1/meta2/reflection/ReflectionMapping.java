@@ -1,9 +1,9 @@
 package com.github.t1.meta2.reflection;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 import java.util.*;
 
-import com.github.t1.meta2.*;
+import com.github.t1.meta2.Mapping;
 
 import lombok.*;
 
@@ -27,6 +27,7 @@ public class ReflectionMapping<B> implements Mapping<B> {
         public FieldReflectionProperty(Field field) {
             super(field.getType());
             this.field = field;
+            this.field.setAccessible(true);
         }
 
         @Override
@@ -35,43 +36,9 @@ public class ReflectionMapping<B> implements Mapping<B> {
         }
 
         @Override
-        public Scalar<B> createScalar() {
-            return new FieldReflectionScalar<>(field);
-        }
-
-        @Override
-        public Sequence<B> createSequence() {
-            return new FieldReflectionSequence<>(field);
-        }
-    }
-
-    private static class FieldReflectionScalar<B> extends ObjectScalar<B> {
-        private final Field field;
-
-        public FieldReflectionScalar(Field field) {
-            this.field = field;
-            this.field.setAccessible(true);
-        }
-
-        @Override
-        @SneakyThrows(ReflectiveOperationException.class)
-        protected Object get(Object object) {
+        @SneakyThrows(IllegalAccessException.class)
+        protected Object get(B object) {
             return field.get(object);
-        }
-    }
-
-    private static class FieldReflectionSequence<B> implements Sequence<B> {
-        private final Field field;
-
-        public FieldReflectionSequence(Field field) {
-            this.field = field;
-            this.field.setAccessible(true);
-        }
-
-        @Override
-        @SneakyThrows(ReflectiveOperationException.class)
-        public int size(B object) {
-            return Array.getLength(field.get(object));
         }
     }
 
