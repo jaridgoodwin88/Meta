@@ -1,7 +1,8 @@
-package com.github.t1.meta2;
+package com.github.t1.meta2.test;
 
 import java.util.*;
 
+import com.github.t1.meta2.Mapping;
 import com.github.t1.meta2.reflection.CollectionsMapping;
 
 public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
@@ -22,6 +23,15 @@ public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
         map.put("intArrayProperty", INT_ARRAY_VALUE);
         map.put("intListProperty", INT_LIST_VALUE);
         map.put("stringListProperty", STRING_LIST_VALUE);
+
+        Map<String, Object> nestedMap = new LinkedHashMap<>();
+        nestedMap.put("nestedStringProperty", "nestedString");
+        map.put("nestedProperty", nestedMap);
+
+        Map<String, Object> nestingMap = new LinkedHashMap<>();
+        nestingMap.put("nestedProperty", nestedMap);
+        map.put("nestingProperty", nestingMap);
+
         return map;
     }
 

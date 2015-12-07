@@ -1,10 +1,10 @@
-package com.github.t1.meta2;
+package com.github.t1.meta2.test;
 
 import java.util.List;
 
 import com.github.t1.meta2.reflection.ReflectionMapping;
 
-public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.ReflectionTest.Pojo> {
+public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionTest.Pojo> {
     // TODO ignore static fields
     // TODO ignore transient fields
     public static class Pojo {
@@ -22,6 +22,17 @@ public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.Refl
         int[] intArrayProperty = INT_ARRAY_VALUE;
         List<Integer> intListProperty = INT_LIST_VALUE;
         List<String> stringListProperty = STRING_LIST_VALUE;
+
+        NestedPojo nestedProperty = new NestedPojo();
+        NestingPojo nestingProperty = new NestingPojo();
+    }
+
+    public static class NestedPojo {
+        String nestedStringProperty = "nestedString";
+    }
+
+    public static class NestingPojo {
+        NestedPojo nestedProperty = new NestedPojo();
     }
 
     @Override

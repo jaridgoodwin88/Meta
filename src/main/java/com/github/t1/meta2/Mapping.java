@@ -3,14 +3,8 @@ package com.github.t1.meta2;
 import java.util.List;
 
 public interface Mapping<B> {
-    public interface Property<B> {
-        StructureKind getKind();
-
+    public interface Property<B> extends Item<B> {
         String getName();
-
-        Scalar<B> getScalar();
-
-        Sequence<B> getSequence();
     }
 
     public Property<B> getProperty(String name);

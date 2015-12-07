@@ -1,48 +1,64 @@
 package com.github.t1.meta2.reflection;
 
+import static com.github.t1.meta2.reflection.ReflectionMapping.*;
+import static java.util.Collections.*;
+
 import java.util.*;
+import java.util.function.Function;
 
 import com.github.t1.meta2.Mapping;
 
 import lombok.*;
 
+@RequiredArgsConstructor
 public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> {
     public static <B extends Map<String, ?>> CollectionsMapping<B> of(B map) {
-        return new CollectionsMapping<>(map);
+        return new CollectionsMapping<>(map, identity());
     }
 
-    private final Map<String, Property<B>> properties;
-
-    private CollectionsMapping(Map<String, ?> map) {
-        this.properties = new LinkedHashMap<>();
-        for (String name : map.keySet())
-            properties.put(name, new MapProperty<>(map.get(name).getClass(), name));
-    }
+    private final Map<String, ?> map;
+    private final Function<Object, B> backtrack;
+    private Map<String, Property<B>> properties;
 
     @ToString
-    private static class MapProperty<B extends Map<String, ?>> extends ObjectProperty<B> {
+    private class MapProperty extends ObjectProperty<B> {
         @Getter
         private final String name;
 
-        public MapProperty(Class<?> type, String name) {
-            super(type);
+        public MapProperty(String name) {
+            super(map.get(name).getClass());
             this.name = name;
         }
 
         @Override
         protected Object get(B map) {
-            return map.get(name);
+            return backtrack.apply(map).get(name);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Mapping<B> createMapping() {
+            return new CollectionsMapping<>((Map<String, ?>) map.get(name), object -> (B) get((B) object));
         }
     }
 
     @Override
     public List<Property<B>> getProperties() {
-        return new ArrayList<>(properties.values());
+        return unmodifiableList(new ArrayList<>(properties().values()));
     }
 
     @Override
     public Property<B> getProperty(String name) {
-        return properties.get(name);
+        return properties().get(name);
+    }
+
+    private Map<String, Property<B>> properties() {
+        if (properties == null) {
+            this.properties = new LinkedHashMap<>();
+            for (String name : map.keySet())
+                properties.put(name, new MapProperty(name));
+        }
+        return properties;
     }
 
 }

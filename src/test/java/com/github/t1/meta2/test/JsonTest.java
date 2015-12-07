@@ -1,4 +1,4 @@
-package com.github.t1.meta2;
+package com.github.t1.meta2.test;
 
 import org.junit.Test;
 
