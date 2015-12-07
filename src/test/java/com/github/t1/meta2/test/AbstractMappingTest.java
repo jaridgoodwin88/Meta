@@ -10,6 +10,8 @@ import static org.assertj.core.api.BDDAssertions.*;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.assertj.core.api.iterable.Extractor;
+import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 
 import com.github.t1.meta2.*;
@@ -44,27 +46,52 @@ public abstract class AbstractMappingTest<B> {
     public void shouldGetProperties() {
         List<Property<B>> properties = mapping.getProperties();
 
-        then(properties) //
-                .extracting(property -> tuple(property.getName(), property.getKind())) //
-                .containsExactly( //
-                        tuple("stringProperty", scalar), //
-                        tuple("booleanProperty", scalar), //
-                        tuple("charProperty", scalar), //
-                        tuple("byteProperty", scalar), //
-                        tuple("shortProperty", scalar), //
-                        tuple("intProperty", scalar), //
-                        tuple("integerProperty", scalar), //
-                        tuple("longProperty", scalar), //
-                        tuple("floatProperty", scalar), //
-                        tuple("doubleProperty", scalar), //
-                        //
-                        tuple("intArrayProperty", sequence), //
-                        tuple("intListProperty", sequence), //
-                        tuple("stringListProperty", sequence), //
-                        //
-                        tuple("nestedProperty", StructureKind.mapping), //
-                        tuple("nestingProperty", StructureKind.mapping) //
-        );
+        then(properties)
+                .extracting(nameAndKind())
+                .containsExactly(
+                        tuple("stringProperty", scalar),
+                        tuple("booleanProperty", scalar),
+                        tuple("charProperty", scalar),
+                        tuple("byteProperty", scalar),
+                        tuple("shortProperty", scalar),
+                        tuple("intProperty", scalar),
+                        tuple("integerProperty", scalar),
+                        tuple("longProperty", scalar),
+                        tuple("floatProperty", scalar),
+                        tuple("doubleProperty", scalar),
+
+                        tuple("intArrayProperty", sequence),
+                        tuple("intListProperty", sequence),
+                        tuple("stringListProperty", sequence),
+
+                        tuple("nestedProperty", StructureKind.mapping),
+                        tuple("nestingProperty", StructureKind.mapping));
+    }
+
+    @Test
+    public void shouldGetNestedProperties() {
+        List<Property<B>> properties = mapping.getProperty("nestedProperty").getMapping().getProperties();
+
+        then(properties).extracting(nameAndKind())
+                .containsExactly(tuple("nestedStringProperty", scalar));
+    }
+
+    @Test
+    public void shouldGetNestingProperties() {
+        List<Property<B>> properties = mapping.getProperty("nestingProperty").getMapping().getProperties();
+
+        then(properties).extracting(nameAndKind())
+                .containsExactly(tuple("nestedProperty", StructureKind.mapping));
+
+        List<Property<B>> nestedProperties =
+                mapping.getPropertyPath("nestingProperty/nestedProperty").getMapping().getProperties();
+
+        then(nestedProperties).extracting(nameAndKind())
+                .containsExactly(tuple("nestedStringProperty", scalar));
+    }
+
+    private Extractor<Property<B>, Tuple> nameAndKind() {
+        return property -> tuple(property.getName(), property.getKind());
     }
 
 
@@ -204,6 +231,13 @@ public abstract class AbstractMappingTest<B> {
         Property<B> outer = whenGetProperty("nestingProperty");
         Property<B> middle = outer.getProperty("nestedProperty");
         Property<B> property = middle.getProperty("nestedStringProperty");
+
+        assertScalar(property, "nestedString");
+    }
+
+    @Test
+    public void shouldGetPropertyPath() {
+        Property<B> property = mapping.getPropertyPath("nestingProperty/nestedProperty/nestedStringProperty");
 
         assertScalar(property, "nestedString");
     }

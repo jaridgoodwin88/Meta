@@ -20,4 +20,12 @@ public interface Mapping<B> {
     public default Sequence<B> getSequence(String name) {
         return getProperty(name).getSequence();
     }
+
+    public default Property<B> getPropertyPath(String path) {
+        String[] elements = path.split("/");
+        Property<B> property = this.getProperty(elements[0]);
+        for (int i = 1; i < elements.length; i++)
+            property = property.getProperty(elements[i]);
+        return property;
+    }
 }
