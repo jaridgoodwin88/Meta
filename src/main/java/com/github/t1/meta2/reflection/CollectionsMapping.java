@@ -26,7 +26,7 @@ public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> 
         private final String name;
 
         public MapProperty(String name) {
-            super(map.get(name).getClass());
+            super(map.get(name).getClass(), "map element " + name);
             this.name = name;
         }
 

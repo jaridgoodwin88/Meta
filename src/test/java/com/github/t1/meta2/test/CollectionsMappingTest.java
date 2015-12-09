@@ -5,7 +5,7 @@ import java.util.*;
 import com.github.t1.meta2.Mapping;
 import com.github.t1.meta2.reflection.CollectionsMapping;
 
-public class CollectionsTest extends AbstractMappingTest<Map<String, Object>> {
+public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Object>> {
     @Override
     protected Map<String, Object> createObject() {
         Map<String, Object> map = new LinkedHashMap<>();

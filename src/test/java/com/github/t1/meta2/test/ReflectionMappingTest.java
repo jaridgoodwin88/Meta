@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.github.t1.meta2.reflection.ReflectionMapping;
 
-public class ReflectionTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionTest.Pojo> {
+public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionMappingTest.Pojo> {
     // TODO ignore static fields
     // TODO ignore transient fields
     public static class Pojo {

@@ -34,7 +34,7 @@ public class ReflectionMapping<B> implements Mapping<B> {
         private final Function<Object, B> backtrack;
 
         public FieldReflectionProperty(Field field, Function<Object, B> backtrack) {
-            super(field.getType());
+            super(field.getType(), field.getName());
             this.field = field;
             this.field.setAccessible(true);
             this.backtrack = backtrack;

@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.BDDAssertions.*;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import org.assertj.core.api.iterable.Extractor;
@@ -26,7 +26,7 @@ public abstract class AbstractMappingTest<B> {
     public static final int INT_VALUE = 12345;
     public static final int INTEGER_VALUE = 12345678;
     public static final long LONG_VALUE = 1234567890123456789L;
-    public static final float FLOAT_VALUE = 12.34f;
+    public static final float FLOAT_VALUE = 1.5f;
     public static final double DOUBLE_VALUE = 12.3456d;
 
     public static final int[] INT_ARRAY_VALUE = { 1, 2, 3, 4, 5 };
@@ -176,18 +176,59 @@ public abstract class AbstractMappingTest<B> {
 
     private <T> void assertScalar(Property<B> property, T expectedValue) {
         Scalar<B> scalar = property.getScalar();
-        then(scalar.get(object, String.class)).contains(expectedValue.toString());
-        for (Class<?> scalarType : PRIMITIVE_WRAPPER_SCALARS)
-            if (scalarType.isInstance(expectedValue)) {
-                @SuppressWarnings("unchecked")
-                Class<T> scalarT = (Class<T>) scalarType;
-                then(scalar.get(object, scalarT)).contains(expectedValue);
-            } else {
-                thenThrownBy(() -> scalar.get(object, scalarType))
+        if (Character.class.isAssignableFrom(expectedValue.getClass()))
+            then(scalar.get(object, String.class)).contains(Integer.toString((char) expectedValue));
+        else
+            then(scalar.get(object, String.class)).contains(expectedValue.toString());
+        for (Class<?> scalarType : PRIMITIVE_WRAPPER_SCALARS) {
+            Object convertedExpectedValue = convert(expectedValue, scalarType);
+            if (convertedExpectedValue == null)
+                then(catchThrowable(() -> scalar.get(object, scalarType)))
+                        .as("thrown exception when getting %s as %s", scalar, scalarType)
                         .isInstanceOf(ClassCastException.class);
-            }
+            else
+                then(get(scalar, scalarType).get())
+                        .as("as %s", scalarType.getName())
+                        .isEqualTo(convertedExpectedValue);
+        }
     }
 
+    private <T> Object convert(T expectedValue, Class<?> scalarType) {
+        if (expectedValue instanceof Number && Number.class.isAssignableFrom(scalarType))
+            return numericValue((Number) expectedValue, scalarType);
+        if (expectedValue instanceof Number && Character.class.isAssignableFrom(scalarType))
+            return (char) ((Number) expectedValue).shortValue();
+        if (expectedValue instanceof Character && Number.class.isAssignableFrom(scalarType))
+            return numericValue((short) (char) expectedValue, scalarType);
+        if (expectedValue instanceof Character && Character.class.isAssignableFrom(scalarType))
+            return (char) expectedValue;
+        if (scalarType.isInstance(expectedValue))
+            return expectedValue;
+        return null;
+    }
+
+    private <T> Object numericValue(Number expectedValue, Class<?> type) {
+        if (Byte.class.isAssignableFrom(type))
+            return expectedValue.byteValue();
+        if (Short.class.isAssignableFrom(type))
+            return expectedValue.shortValue();
+        if (Integer.class.isAssignableFrom(type))
+            return expectedValue.intValue();
+        if (Long.class.isAssignableFrom(type))
+            return expectedValue.longValue();
+        if (Float.class.isAssignableFrom(type))
+            return expectedValue.floatValue();
+        if (Double.class.isAssignableFrom(type))
+            return expectedValue.doubleValue();
+        throw new UnsupportedOperationException("unexpected numeric type: " + type.getName());
+    }
+
+    private <T> Optional<T> get(Scalar<B> scalar, Class<?> scalarType) {
+        @SuppressWarnings("unchecked")
+        Class<T> scalarT = (Class<T>) scalarType;
+        Optional<T> optional = scalar.get(object, scalarT);
+        return optional;
+    }
 
     @Test
     public void shouldGetIntArrayProperty() {

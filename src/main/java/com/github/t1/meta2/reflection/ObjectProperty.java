@@ -18,13 +18,15 @@ public abstract class ObjectProperty<B> implements Property<B> {
 
     @Getter
     private final StructureKind kind;
+    private final String name;
 
     private Scalar<B> scalar;
     private Sequence<B> sequence;
     private Mapping<B> mapping;
 
-    public ObjectProperty(Class<?> type) {
+    public ObjectProperty(Class<?> type, String name) {
         this.kind = structure(type);
+        this.name = name;
     }
 
     private StructureKind structure(Class<?> type) {
@@ -46,7 +48,7 @@ public abstract class ObjectProperty<B> implements Property<B> {
     }
 
     protected Scalar<B> createScalar() {
-        return new ObjectGlue<>(object -> get(object));
+        return glue();
     }
 
 
@@ -60,7 +62,12 @@ public abstract class ObjectProperty<B> implements Property<B> {
     }
 
     protected Sequence<B> createSequence() {
-        return new ObjectGlue<>(object -> get(object));
+        return glue();
+    }
+
+
+    private ObjectGlue<B> glue() {
+        return new ObjectGlue<>(object -> get(object), "property " + name);
     }
 
 

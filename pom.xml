@@ -123,6 +123,14 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        
+        <!-- optional scope -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0</version>
+            <optional>true</optional>
+        </dependency>
 
         <!-- compile scope -->
         <dependency>
