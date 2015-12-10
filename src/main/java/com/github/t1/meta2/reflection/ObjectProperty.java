@@ -40,41 +40,33 @@ public abstract class ObjectProperty<B> implements Property<B> {
 
     @Override
     public final Scalar<B> getScalar() {
-        if (getKind() != StructureKind.scalar)
-            throw new IllegalStateException(this + " is a " + getKind() + ", not a scalar");
+        checkKind(StructureKind.scalar);
         if (this.scalar == null)
             this.scalar = createScalar();
         return scalar;
     }
 
     protected Scalar<B> createScalar() {
-        return glue();
+        return new ObjectGlue.ObjectScalar<>(object -> get(object), "property " + name);
     }
 
 
     @Override
     public final Sequence<B> getSequence() {
-        if (getKind() != StructureKind.sequence)
-            throw new IllegalStateException(this + " is a " + getKind() + ", not a sequence");
+        checkKind(StructureKind.sequence);
         if (this.sequence == null)
             this.sequence = createSequence();
         return sequence;
     }
 
     protected Sequence<B> createSequence() {
-        return glue();
-    }
-
-
-    private ObjectGlue<B> glue() {
-        return new ObjectGlue<>(object -> get(object), "property " + name);
+        return new ObjectGlue.ObjectSequence<>(object -> get(object), "property " + name);
     }
 
 
     @Override
     public Mapping<B> getMapping() {
-        if (getKind() != StructureKind.mapping)
-            throw new IllegalStateException(this + " is a " + getKind() + ", not a mapping");
+        checkKind(StructureKind.mapping);
         if (this.mapping == null)
             this.mapping = createMapping();
         return mapping;

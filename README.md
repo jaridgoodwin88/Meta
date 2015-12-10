@@ -1,6 +1,11 @@
 # Meta
 
-A typesafe meta model for Java and representations for other data formats.
+A meta model for Java and representations for other data formats.
+
+Typical use-cases for programming at a meta level are:
+* Validate
+* Convert
+* Diff
 
 ## Example
 

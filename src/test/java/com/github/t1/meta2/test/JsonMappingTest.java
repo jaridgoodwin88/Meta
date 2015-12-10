@@ -1,12 +1,11 @@
 package com.github.t1.meta2.test;
 
 import static com.github.t1.meta2.json.JsonArrayCollector.*;
+import static org.junit.Assume.*;
 
 import java.util.stream.IntStream;
 
 import javax.json.*;
-
-import org.junit.Ignore;
 
 import com.github.t1.meta2.Mapping;
 import com.github.t1.meta2.json.JsonMapping;
@@ -43,34 +42,42 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     }
 
     @Override
-    @Ignore
-    public void shouldGetNestedProperties() {}
+    public void shouldGetNestedProperties() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetNestingProperties() {}
+    public void shouldGetNestingProperties() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetIntArrayProperty() {}
+    public void shouldGetIntArrayProperty() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetIntegerListProperty() {}
+    public void shouldGetIntegerListProperty() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetStringListProperty() {}
+    public void shouldGetStringListProperty() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetNestedProperty() {}
+    public void shouldGetNestedProperty() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetDoublyNestedProperty() {}
+    public void shouldGetDoublyNestedProperty() {
+        assumeTrue(false);
+    }
 
     @Override
-    @Ignore
-    public void shouldGetPropertyPath() {}
+    public void shouldGetPropertyPath() {
+        assumeTrue(false);
+    }
 }
