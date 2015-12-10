@@ -16,8 +16,8 @@ public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> 
         return new CollectionsMapping<>(map, identity());
     }
 
-    private final Map<String, ?> map;
-    private final Function<Object, B> backtrack;
+    private final B map;
+    private final Function<B, B> backtrack;
     private Map<String, Property<B>> properties;
 
     @ToString
@@ -38,7 +38,7 @@ public class CollectionsMapping<B extends Map<String, ?>> implements Mapping<B> 
         @Override
         @SuppressWarnings("unchecked")
         protected Mapping<B> createMapping() {
-            return new CollectionsMapping<>((Map<String, ?>) map.get(name), object -> (B) get((B) object));
+            return new CollectionsMapping<>((B) map.get(name), object -> (B) get(object));
         }
     }
 

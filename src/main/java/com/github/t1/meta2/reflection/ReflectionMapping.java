@@ -16,13 +16,13 @@ public class ReflectionMapping<B> implements Mapping<B> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <B> Function<Object, B> identity() {
-        return self -> (B) self;
+    public static <B, T> Function<B, T> identity() {
+        return self -> (T) self;
     }
 
     private final Map<String, FieldReflectionProperty<B>> properties;
 
-    private ReflectionMapping(Class<?> type, Function<Object, B> backtrack) {
+    private ReflectionMapping(Class<?> type, Function<B, Object> backtrack) {
         this.properties = new LinkedHashMap<>();
         for (Field field : type.getDeclaredFields())
             properties.put(field.getName(), new FieldReflectionProperty<>(field, backtrack));
@@ -31,9 +31,9 @@ public class ReflectionMapping<B> implements Mapping<B> {
     @ToString
     private static class FieldReflectionProperty<B> extends ObjectProperty<B> {
         private final Field field;
-        private final Function<Object, B> backtrack;
+        private final Function<B, Object> backtrack;
 
-        public FieldReflectionProperty(Field field, Function<Object, B> backtrack) {
+        public FieldReflectionProperty(Field field, Function<B, Object> backtrack) {
             super(field.getType(), field.getName());
             this.field = field;
             this.field.setAccessible(true);
@@ -52,9 +52,8 @@ public class ReflectionMapping<B> implements Mapping<B> {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         protected Mapping<B> createMapping() {
-            return new ReflectionMapping<>(field.getType(), object -> (B) get((B) object));
+            return new ReflectionMapping<>(field.getType(), object -> get(object));
         }
     }
 
