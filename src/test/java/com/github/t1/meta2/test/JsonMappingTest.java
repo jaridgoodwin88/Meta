@@ -52,21 +52,6 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     }
 
     @Override
-    public void shouldGetIntArrayProperty() {
-        assumeTrue(false);
-    }
-
-    @Override
-    public void shouldGetIntegerListProperty() {
-        assumeTrue(false);
-    }
-
-    @Override
-    public void shouldGetStringListProperty() {
-        assumeTrue(false);
-    }
-
-    @Override
     public void shouldGetNestedProperty() {
         assumeTrue(false);
     }

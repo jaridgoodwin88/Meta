@@ -5,6 +5,7 @@ import static java.util.Collections.*;
 import static javax.json.JsonValue.ValueType.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.json.*;
 import javax.json.JsonValue.ValueType;
@@ -116,26 +117,33 @@ public class JsonMapping implements Mapping<JsonObject> {
 
         @Override
         public Scalar<JsonObject> getScalar() {
-            return new Scalar<JsonObject>() {
-                @Override
-                @SuppressWarnings("unchecked")
-                public <T> Optional<T> get(JsonObject object, Class<T> type) {
-                    JsonValue value = object.get(getName());
-                    return Optional.of((T) cast(value, type));
-                }
+            return new JsonScalar<>(getName(), object -> object.get(getName()));
+        }
+    }
 
-                @Override
-                public String toString() {
-                    return "JSON scalar: " + getName();
-                }
-            };
+    @RequiredArgsConstructor
+    private static class JsonScalar<B> implements Scalar<B> {
+        private final String toStringInfo;
+        private final Function<B, JsonValue> backtrack;
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> Optional<T> get(B object, Class<T> type) {
+            JsonValue value = backtrack.apply(object);
+            return Optional.of((T) cast(value, type));
+        }
+
+        @Override
+        public String toString() {
+            return "JSON scalar: " + toStringInfo;
         }
     }
 
     private static class JsonSequenceProperty extends JsonProperty {
         @Getter
         @RequiredArgsConstructor
-        private static class JsonElement implements Element<JsonObject> {
+        private static class JsonElement<B> implements Element<B> {
+            private final Function<B, JsonArray> backtrack;
             private final int index;
 
             @Override
@@ -144,8 +152,10 @@ public class JsonMapping implements Mapping<JsonObject> {
             }
 
             @Override
-            public Scalar<JsonObject> getScalar() {
-                return null;
+            public Scalar<B> getScalar() {
+                return new JsonScalar<>(Integer.toString(index), object -> {
+                    return backtrack.apply(object).get(index);
+                });
             }
 
             @Override
@@ -168,7 +178,7 @@ public class JsonMapping implements Mapping<JsonObject> {
 
                 @Override
                 public Element<JsonObject> get(int index) {
-                    return new JsonElement(index);
+                    return new JsonElement<>(object -> object.getJsonArray(getName()), index);
                 }
             };
         }
