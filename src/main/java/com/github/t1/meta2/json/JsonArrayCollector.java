@@ -22,7 +22,7 @@ public class JsonArrayCollector<T> implements Collector<T, JsonArrayBuilder, Jso
     public BiConsumer<JsonArrayBuilder, T> accumulator() {
         return (builder, value) -> {
             if (value instanceof Integer)
-                builder.add((int) value);
+                builder.add((Integer) value);
             else
                 builder.add((String) value);
         };
