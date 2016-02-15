@@ -1,7 +1,7 @@
 package com.github.t1.meta2.reflection;
 
-import static com.github.t1.meta2.reflection.ReflectionMapping.*;
 import static java.util.Collections.*;
+import static java.util.function.Function.*;
 
 import java.util.*;
 import java.util.function.Function;

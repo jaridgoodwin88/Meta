@@ -12,6 +12,11 @@ import com.github.t1.meta2.json.JsonMapping;
 
 public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     @Override
+    protected boolean hasSchema() {
+        return false;
+    }
+
+    @Override
     protected JsonObject createObject() {
         JsonObjectBuilder json = Json.createObjectBuilder();
         json.add("stringProperty", STRING_VALUE);
@@ -28,12 +33,20 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
         json.add("intArrayProperty", IntStream.of(INT_ARRAY_VALUE).boxed().collect(asJsonArray()));
         json.add("intListProperty", INT_LIST_VALUE.stream().collect(asJsonArray()));
         json.add("stringListProperty", STRING_LIST_VALUE.stream().collect(asJsonArray()));
+        json.add("nestedSequenceSequenceProperty", Json.createArrayBuilder()
+                .add(Json.createArrayBuilder().add("A1").add("A2"))
+                .add(Json.createArrayBuilder().add("B1").add("B2").add("B3")));
+        json.add("nestedMappingSequenceProperty", Json.createArrayBuilder().add(nested("A")).add(nested("B")));
 
-        json.add("nestedProperty", Json.createObjectBuilder().add("nestedStringProperty", "nestedString"));
+        json.add("nestedProperty", nested("nestedString"));
         json.add("nestingProperty", Json.createObjectBuilder().add("nestedProperty",
-                Json.createObjectBuilder().add("nestedStringProperty", "nestedString")));
+                nested("nestedString")));
 
         return json.build();
+    }
+
+    private JsonObjectBuilder nested(String value) {
+        return Json.createObjectBuilder().add("nestedStringProperty", value);
     }
 
     @Override

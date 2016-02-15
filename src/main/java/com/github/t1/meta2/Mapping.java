@@ -2,30 +2,34 @@ package com.github.t1.meta2;
 
 import java.util.List;
 
+/**
+ * Projection of a number of distinct keys to corresponding values. A.k.a. Map, Dictionary, etc.
+ */
 public interface Mapping<B> {
-    public interface Property<B> extends Item<B> {
+    /** The key-value pair in a {@link Mapping}. */
+    interface Property<B> extends Item<B> {
         String getName();
     }
 
-    public Property<B> getProperty(String name);
+    Property<B> getProperty(String name);
 
-    public List<Property<B>> getProperties();
+    List<Property<B>> getProperties();
 
     /** convenience method */
-    public default Scalar<B> getScalar(String name) {
+    default Scalar<B> getScalar(String name) {
         return getProperty(name).getScalar();
     }
 
     /** convenience method */
-    public default Sequence<B> getSequence(String name) {
+    default Sequence<B> getSequence(String name) {
         return getProperty(name).getSequence();
     }
 
-    public default Property<B> getPropertyPath(String path) {
+    default Property<B> getPropertyPath(String path) {
         String[] elements = path.split("/");
         Property<B> property = this.getProperty(elements[0]);
         for (int i = 1; i < elements.length; i++)
-            property = property.getProperty(elements[i]);
+            property = property.get(elements[i]);
         return property;
     }
 }

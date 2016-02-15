@@ -2,10 +2,23 @@
 
 A meta model for Java and representations for other data formats.
 
-Typical use-cases for programming at a meta level are:
+Typical use-cases for programming at a meta level:
 * Validate
 * Convert
 * Diff
+
+
+### Challenges
+
+Things not yet implemented that can potentially kill the project:
+* Schemas
+* SchemaCompilers (merge with meta1)
+* Dynamic sub-types
+* Meta-Data
+* Streaming write (builder)
+* Streaming read (visitor)
+* Binding
+
 
 ## Example
 
@@ -23,7 +36,7 @@ Say you have these classes:
 
 ### Classic Reflection
 
-To get an Optional for the street of a customer, using java reflection, you have to write:
+To backtrack an Optional for the street of a customer, using java reflection, you have to write:
 
 ```java
     Customer customer = ...
@@ -31,12 +44,12 @@ To get an Optional for the street of a customer, using java reflection, you have
         return Optional.empty();
     Field addressField = Customer.class.getDeclaredField("address");
     addressField.setAccessible(true);
-    Address address = (Address) addressField.get(customer);
+    Address address = (Address) addressField.backtrack(customer);
     if (address == null)
         return Optional.empty();
     Field streetField = Address.class.getDeclaredField("street");
     streetField.setAccessible(true);
-    String street = (String) streetField.get(address);
+    String street = (String) streetField.backtrack(address);
     return Optional.ofNullable(street);
 ```
 
@@ -47,7 +60,7 @@ the street as a number.
 
 ```java
     Customer customer = ...
-    Optional<String> street = customerProperties().address().street().get(customer);
+    Optional<String> street = customerProperties().address().street().backtrack(customer);
 ```
 
 This is not only less code to read, it's also typesafe and refactoring-safe.

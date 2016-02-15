@@ -47,7 +47,7 @@ public abstract class ObjectProperty<B> implements Property<B> {
     }
 
     protected Scalar<B> createScalar() {
-        return new ObjectGlue.ObjectScalar<>(object -> get(object), "property " + name);
+        return new ObjectGlue.ObjectScalar<>(this::get, "property " + name);
     }
 
 
@@ -60,7 +60,7 @@ public abstract class ObjectProperty<B> implements Property<B> {
     }
 
     protected Sequence<B> createSequence() {
-        return new ObjectGlue.ObjectSequence<>(object -> get(object), "property " + name);
+        return new ObjectGlue.ObjectSequence<>(this::get, "property " + name);
     }
 
 

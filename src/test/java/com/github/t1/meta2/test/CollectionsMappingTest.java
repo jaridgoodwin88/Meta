@@ -1,11 +1,18 @@
 package com.github.t1.meta2.test;
 
+import static java.util.Arrays.*;
+
 import java.util.*;
 
 import com.github.t1.meta2.Mapping;
 import com.github.t1.meta2.reflection.CollectionsMapping;
 
 public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Object>> {
+    @Override
+    protected boolean hasSchema() {
+        return false;
+    }
+
     @Override
     protected Map<String, Object> createObject() {
         Map<String, Object> map = new LinkedHashMap<>();
@@ -23,16 +30,23 @@ public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Obje
         map.put("intArrayProperty", INT_ARRAY_VALUE);
         map.put("intListProperty", INT_LIST_VALUE);
         map.put("stringListProperty", STRING_LIST_VALUE);
+        map.put("nestedSequenceSequenceProperty", asList(asList("A1", "A2"), asList("B1", "B2", "B3")));
+        map.put("nestedMappingSequenceProperty", asList(nested("A"), nested("B")));
 
-        Map<String, Object> nestedMap = new LinkedHashMap<>();
-        nestedMap.put("nestedStringProperty", "nestedString");
-        map.put("nestedProperty", nestedMap);
-
-        Map<String, Object> nestingMap = new LinkedHashMap<>();
-        nestingMap.put("nestedProperty", nestedMap);
-        map.put("nestingProperty", nestingMap);
+        map.put("nestedProperty", nested("nestedString"));
+        map.put("nestingProperty", nested("nestedProperty", nested("nestedString")));
 
         return map;
+    }
+
+    private Map<String, Object> nested(String value) {
+        return nested("nestedStringProperty", value);
+    }
+
+    private Map<String, Object> nested(String name, Object value) {
+        Map<String, Object> nestedMap = new LinkedHashMap<>();
+        nestedMap.put(name, value);
+        return nestedMap;
     }
 
     @Override

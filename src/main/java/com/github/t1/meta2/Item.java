@@ -2,7 +2,10 @@ package com.github.t1.meta2;
 
 import static com.github.t1.meta2.StructureKind.*;
 
+import java.util.Optional;
+
 import com.github.t1.meta2.Mapping.Property;
+import com.github.t1.meta2.Sequence.Element;
 
 /** Either a {@link Mapping.Property} or a {@link Sequence.Element} */
 interface Item<B> {
@@ -15,20 +18,37 @@ interface Item<B> {
 
     default Scalar<B> getScalar() {
         checkKind(scalar);
-        throw new UnsupportedOperationException("not overloaded");
+        throw notOverloaded();
     }
 
     default Sequence<B> getSequence() {
         checkKind(sequence);
-        throw new UnsupportedOperationException("not overloaded");
+        throw notOverloaded();
     }
 
     default Mapping<B> getMapping() {
         checkKind(mapping);
-        throw new UnsupportedOperationException("not overloaded");
+        throw notOverloaded();
     }
 
-    default Property<B> getProperty(String name) {
+    default UnsupportedOperationException notOverloaded() {
+        return new UnsupportedOperationException("not overloaded");
+    }
+
+    /** convenience method */
+    default <T> Optional<T> get(B object, Class<T> type) {
+        return getScalar().get(object, type);
+    }
+
+    /** convenience method */
+    @SuppressWarnings("ClassReferencesSubclass")
+    default Element<B> get(int index) {
+        return getSequence().get(index);
+    }
+
+    /** convenience method */
+    @SuppressWarnings("ClassReferencesSubclass")
+    default Property<B> get(String name) {
         return getMapping().getProperty(name);
     }
 }

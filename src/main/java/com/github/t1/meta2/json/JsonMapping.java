@@ -2,27 +2,27 @@ package com.github.t1.meta2.json;
 
 import static com.github.t1.meta2.StructureKind.*;
 import static java.util.Collections.*;
+import static java.util.function.Function.*;
 import static javax.json.JsonValue.ValueType.*;
 
 import java.util.*;
 import java.util.function.Function;
 
 import javax.json.*;
-import javax.json.JsonValue.ValueType;
 
 import com.github.t1.meta2.*;
-import com.github.t1.meta2.Sequence.Element;
 
 import lombok.*;
 
 @RequiredArgsConstructor
 public class JsonMapping implements Mapping<JsonObject> {
     public static JsonMapping of(JsonObject object) {
-        return new JsonMapping(object);
+        return new JsonMapping(object, identity());
     }
 
     private final JsonObject object;
-    private Map<String, JsonProperty> properties;
+    private final Function<JsonObject, JsonObject> backtrack;
+    private Map<String, Property<JsonObject>> properties;
 
     @Override
     public Property<JsonObject> getProperty(String name) {
@@ -34,29 +34,36 @@ public class JsonMapping implements Mapping<JsonObject> {
         return unmodifiableList(new ArrayList<>(properties().values()));
     }
 
-    private Map<String, JsonProperty> properties() {
+    @SuppressWarnings("unchecked")
+    private Map<String, Property<JsonObject>> properties() {
         if (properties == null) {
             properties = new LinkedHashMap<>();
-            object.forEach((name, value) -> properties.put(name, JsonProperty.of(value.getValueType(), name)));
+            object.entrySet().stream()
+                    .map(entry -> of(entry.getKey(), object))
+                    .forEach(p -> properties.put(p.getName(), p));
         }
         return properties;
     }
 
+    public JsonProperty of(String name, JsonObject object) {
+        switch (object.get(name).getValueType()) {
+        case STRING:
+        case NUMBER:
+        case FALSE:
+        case TRUE:
+        case NULL:
+            return new JsonScalarProperty(name);
+        case ARRAY:
+            return new JsonSequenceProperty(name);
+        case OBJECT:
+            return new JsonMappingProperty(name);
+        }
+        throw new UnsupportedOperationException("unreachable code");
+    }
+
     @Getter
     @RequiredArgsConstructor
-    private static abstract class JsonProperty implements Property<JsonObject> {
-        public static JsonProperty of(ValueType valueType, String name) {
-            switch (kind(valueType)) {
-            case scalar:
-                return new JsonScalarProperty(name);
-            case sequence:
-                return new JsonSequenceProperty(name);
-            case mapping:
-                return new JsonMappingProperty(name);
-            }
-            throw new UnsupportedOperationException("unreachable code");
-        }
-
+    private static abstract class JsonProperty implements Property {
         private final StructureKind kind;
         private final String name;
 
@@ -66,23 +73,9 @@ public class JsonMapping implements Mapping<JsonObject> {
         }
     }
 
-    private static StructureKind kind(ValueType valueType) {
-        switch (valueType) {
-        case STRING:
-        case NUMBER:
-        case FALSE:
-        case TRUE:
-        case NULL:
-            return scalar;
-        case ARRAY:
-            return sequence;
-        case OBJECT:
-            return mapping;
-        }
-        throw new UnsupportedOperationException("unreachable code");
-    }
-
-    private static Object cast(JsonValue value, Class<?> targetType) {
+    static Object cast(JsonValue value, Class<?> targetType) {
+        if (value == null)
+            return null;
         if (String.class.isAssignableFrom(targetType))
             if (value instanceof JsonString)
                 return ((JsonString) value).getString();
@@ -117,76 +110,37 @@ public class JsonMapping implements Mapping<JsonObject> {
 
         @Override
         public Scalar<JsonObject> getScalar() {
+            checkKind(scalar);
             return new JsonScalar<>(getName(), object -> object.get(getName()));
         }
     }
 
-    @RequiredArgsConstructor
-    private static class JsonScalar<B> implements Scalar<B> {
-        private final String toStringInfo;
-        private final Function<B, JsonValue> backtrack;
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> get(B object, Class<T> type) {
-            JsonValue value = backtrack.apply(object);
-            return Optional.of((T) cast(value, type));
-        }
-
-        @Override
-        public String toString() {
-            return "JSON scalar: " + toStringInfo;
-        }
-    }
-
-    private static class JsonSequenceProperty extends JsonProperty {
-        @Getter
-        @RequiredArgsConstructor
-        private static class JsonElement<B> implements Element<B> {
-            private final Function<B, JsonArray> backtrack;
-            private final int index;
-
-            @Override
-            public String toString() {
-                return "JSON " + getKind() + " element " + index;
-            }
-
-            @Override
-            public Scalar<B> getScalar() {
-                return new JsonScalar<>(Integer.toString(index), object -> {
-                    return backtrack.apply(object).get(index);
-                });
-            }
-
-            @Override
-            public StructureKind getKind() {
-                return null;
-            }
-        }
-
+    static class JsonSequenceProperty extends JsonProperty {
         public JsonSequenceProperty(String name) {
             super(sequence, name);
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public Sequence<JsonObject> getSequence() {
-            return new Sequence<JsonObject>() {
-                @Override
-                public int size(JsonObject object) {
-                    return object.getJsonArray(getName()).size();
-                }
-
-                @Override
-                public Element<JsonObject> get(int index) {
-                    return new JsonElement<>(object -> object.getJsonArray(getName()), index);
-                }
-            };
+            checkKind(sequence);
+            return (Sequence) new JsonSequence(object -> ((JsonObject) object).getJsonArray(getName()));
         }
     }
 
-    private static class JsonMappingProperty extends JsonProperty {
+    private class JsonMappingProperty extends JsonProperty {
         public JsonMappingProperty(String name) {
             super(mapping, name);
+        }
+
+        @Override
+        public JsonMapping getMapping() {
+            checkKind(mapping);
+            return new JsonMapping((JsonObject) object.get(getName()), o -> (JsonObject) get(o));
+        }
+
+        private Object get(JsonObject o) {
+            return backtrack.apply(o).getJsonObject(getName());
         }
     }
 }

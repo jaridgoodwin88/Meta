@@ -10,32 +10,32 @@ import com.github.t1.meta2.Sequence.Element;
 import lombok.*;
 
 @RequiredArgsConstructor
-class ObjectGlue<B> {
-    static class ObjectScalar<B> extends ObjectGlue<B> implements Scalar<B> {
-        private final Function<B, Object> get;
+class ObjectGlue {
+    static class ObjectScalar<B> extends ObjectGlue implements Scalar<B> {
+        private final Function<B, Object> backtrack;
 
-        public ObjectScalar(Function<B, Object> get, String toString) {
+        public ObjectScalar(Function<B, Object> backtrack, String toString) {
             super(toString);
-            this.get = get;
+            this.backtrack = backtrack;
         }
 
         @Override
         public final <T> Optional<T> get(B object, Class<T> type) {
-            return Optional.ofNullable(get.apply(object)).map(value -> cast(value, type));
+            return Optional.ofNullable(backtrack.apply(object)).map(value -> cast(value, type));
         }
     }
 
-    static class ObjectSequence<B> extends ObjectGlue<B> implements Sequence<B> {
-        private Function<B, Object> get;
+    static class ObjectSequence<B> extends ObjectGlue implements Sequence<B> {
+        private Function<B, Object> backtrack;
 
-        public ObjectSequence(Function<B, Object> get, String toString) {
+        public ObjectSequence(Function<B, Object> backtrack, String toString) {
             super(toString);
-            this.get = get;
+            this.backtrack = backtrack;
         }
 
         @Override
         public int size(B object) {
-            Object sequence = get.apply(object);
+            Object sequence = backtrack.apply(object);
             if (sequence instanceof Collection)
                 return ((Collection<?>) sequence).size();
             return Array.getLength(sequence);
@@ -43,12 +43,13 @@ class ObjectGlue<B> {
 
         @Override
         public Element<B> get(int index) {
-            return new ObjectElement<>(get, index, null);
+            return new ObjectElement<>(backtrack, index, null);
         }
     }
 
     private final String toString;
 
+    @SuppressWarnings("ChainOfInstanceofChecks")
     private static <T> T cast(Object value, Class<T> type) {
         if (Number.class.isAssignableFrom(type) && value instanceof Number)
             return numericCast((Number) value, type);
@@ -88,32 +89,51 @@ class ObjectGlue<B> {
     @Getter
     @RequiredArgsConstructor
     private static class ObjectElement<B> implements Element<B> {
-        private final Function<B, Object> get;
+        @NonNull
+        private final Function<B, Object> backtrack;
+        @NonNull
         private final int index;
         private final StructureKind kind;
 
         @Override
         public Scalar<B> getScalar() {
-            return new ObjectScalar<>(object -> getElement(object), "element " + index);
-        }
-
-        private Object getElement(B object) {
-            Object sequence = get.apply(object);
-            if (sequence instanceof List)
-                return ((List<?>) sequence).get(index);
-            return Array.get(sequence, index);
+            return new ObjectScalar<>(getElement(), toString());
         }
 
         @Override
         public Sequence<B> getSequence() {
-            // TODO Auto-generated method stub
-            return null;
+            return new ObjectSequence<>(getElement(), toString());
         }
 
         @Override
         public Mapping<B> getMapping() {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        private Function<B, Object> getElement() {
+            return this::getElement;
+        }
+
+        private Object getElement(B object) {
+            Object sequence = backtrack.apply(object);
+            if (sequence == null || index >= size(sequence))
+                return null;
+            if (sequence instanceof List)
+                return ((List<?>) sequence).get(index);
+            else
+                return Array.get(sequence, index);
+        }
+
+        private int size(Object sequence) {
+            if (sequence instanceof List)
+                return ((List<?>) sequence).size();
+            return Array.getLength(sequence);
+        }
+
+        @Override
+        public String toString() {
+            return "element " + index;
         }
     }
 

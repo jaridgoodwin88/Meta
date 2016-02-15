@@ -4,13 +4,14 @@ import static com.github.t1.meta2.StructureKind.*;
 import static com.github.t1.meta2.reflection.ObjectProperty.*;
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
-import org.assertj.core.api.iterable.Extractor;
 import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 
@@ -33,6 +34,8 @@ public abstract class AbstractMappingTest<B> {
     public static final List<Integer> INT_LIST_VALUE = IntStream.of(INT_ARRAY_VALUE).boxed().collect(toList());
     public static final List<String> STRING_LIST_VALUE = asList("one", "two", "three");
 
+    protected abstract boolean hasSchema();
+
     protected abstract B createObject();
 
     protected abstract Mapping<B> createMapping();
@@ -47,7 +50,7 @@ public abstract class AbstractMappingTest<B> {
         List<Property<B>> properties = mapping.getProperties();
 
         then(properties)
-                .extracting(nameAndKind())
+                .extracting(this::nameAndKind)
                 .containsExactly(
                         tuple("stringProperty", scalar),
                         tuple("booleanProperty", scalar),
@@ -63,6 +66,8 @@ public abstract class AbstractMappingTest<B> {
                         tuple("intArrayProperty", sequence),
                         tuple("intListProperty", sequence),
                         tuple("stringListProperty", sequence),
+                        tuple("nestedSequenceSequenceProperty", sequence),
+                        tuple("nestedMappingSequenceProperty", sequence),
 
                         tuple("nestedProperty", StructureKind.mapping),
                         tuple("nestingProperty", StructureKind.mapping));
@@ -72,7 +77,7 @@ public abstract class AbstractMappingTest<B> {
     public void shouldGetNestedProperties() {
         List<Property<B>> properties = mapping.getProperty("nestedProperty").getMapping().getProperties();
 
-        then(properties).extracting(nameAndKind())
+        then(properties).extracting(this::nameAndKind)
                 .containsExactly(tuple("nestedStringProperty", scalar));
     }
 
@@ -80,22 +85,22 @@ public abstract class AbstractMappingTest<B> {
     public void shouldGetNestingProperties() {
         List<Property<B>> properties = mapping.getProperty("nestingProperty").getMapping().getProperties();
 
-        then(properties).extracting(nameAndKind())
+        then(properties).extracting(this::nameAndKind)
                 .containsExactly(tuple("nestedProperty", StructureKind.mapping));
 
         List<Property<B>> nestedProperties =
                 mapping.getPropertyPath("nestingProperty/nestedProperty").getMapping().getProperties();
 
-        then(nestedProperties).extracting(nameAndKind())
+        then(nestedProperties).extracting(this::nameAndKind)
                 .containsExactly(tuple("nestedStringProperty", scalar));
     }
 
-    private Extractor<Property<B>, Tuple> nameAndKind() {
-        return property -> tuple(property.getName(), property.getKind());
+    private Tuple nameAndKind(Property<?> property) {
+        return tuple(property.getName(), property.getKind());
     }
 
 
-    protected Property<B> whenGetProperty(String name) {
+    protected Property<B> getProperty(String name) {
         Property<B> property = mapping.getProperty(name);
 
         then(property).isNotNull();
@@ -106,70 +111,70 @@ public abstract class AbstractMappingTest<B> {
 
     @Test
     public void shouldGetStringProperty() {
-        Property<B> property = whenGetProperty("stringProperty");
+        Property<B> property = getProperty("stringProperty");
 
         assertScalar(property, STRING_VALUE);
     }
 
     @Test
     public void shouldGetBooleanProperty() {
-        Property<B> property = whenGetProperty("booleanProperty");
+        Property<B> property = getProperty("booleanProperty");
 
         assertScalar(property, BOOLEAN_VALUE);
     }
 
     @Test
     public void shouldGetCharProperty() {
-        Property<B> property = whenGetProperty("charProperty");
+        Property<B> property = getProperty("charProperty");
 
         assertScalar(property, CHARACTER_VALUE);
     }
 
     @Test
     public void shouldGetByteProperty() {
-        Property<B> property = whenGetProperty("byteProperty");
+        Property<B> property = getProperty("byteProperty");
 
         assertScalar(property, BYTE_VALUE);
     }
 
     @Test
     public void shouldGetShortProperty() {
-        Property<B> property = whenGetProperty("shortProperty");
+        Property<B> property = getProperty("shortProperty");
 
         assertScalar(property, SHORT_VALUE);
     }
 
     @Test
     public void shouldGetIntProperty() {
-        Property<B> property = whenGetProperty("intProperty");
+        Property<B> property = getProperty("intProperty");
 
         assertScalar(property, INT_VALUE);
     }
 
     @Test
     public void shouldGetIntegerProperty() {
-        Property<B> property = whenGetProperty("integerProperty");
+        Property<B> property = getProperty("integerProperty");
 
         assertScalar(property, INTEGER_VALUE);
     }
 
     @Test
     public void shouldGetLongProperty() {
-        Property<B> property = whenGetProperty("longProperty");
+        Property<B> property = getProperty("longProperty");
 
         assertScalar(property, LONG_VALUE);
     }
 
     @Test
     public void shouldGetFloatProperty() {
-        Property<B> property = whenGetProperty("floatProperty");
+        Property<B> property = getProperty("floatProperty");
 
         assertScalar(property, FLOAT_VALUE);
     }
 
     @Test
     public void shouldGetDoubleProperty() {
-        Property<B> property = whenGetProperty("doubleProperty");
+        Property<B> property = getProperty("doubleProperty");
 
         assertScalar(property, DOUBLE_VALUE);
     }
@@ -177,7 +182,7 @@ public abstract class AbstractMappingTest<B> {
     private <T> void assertScalar(Property<B> property, T expectedValue) {
         Scalar<B> scalar = property.getScalar();
         if (Character.class.isAssignableFrom(expectedValue.getClass()))
-            then(scalar.get(object, String.class)).contains(Integer.toString((char) expectedValue));
+            then(scalar.get(object, String.class)).contains(Integer.toString((Character) expectedValue));
         else
             then(scalar.get(object, String.class)).contains(expectedValue.toString());
         for (Class<?> scalarType : PRIMITIVE_WRAPPER_SCALARS) {
@@ -193,21 +198,22 @@ public abstract class AbstractMappingTest<B> {
         }
     }
 
+    @SuppressWarnings("ChainOfInstanceofChecks")
     private <T> Object convert(T expectedValue, Class<?> scalarType) {
         if (expectedValue instanceof Number && Number.class.isAssignableFrom(scalarType))
             return numericValue((Number) expectedValue, scalarType);
         if (expectedValue instanceof Number && Character.class.isAssignableFrom(scalarType))
             return (char) ((Number) expectedValue).shortValue();
         if (expectedValue instanceof Character && Number.class.isAssignableFrom(scalarType))
-            return numericValue((short) (char) expectedValue, scalarType);
+            return numericValue((short) (char) (Character) expectedValue, scalarType);
         if (expectedValue instanceof Character && Character.class.isAssignableFrom(scalarType))
-            return (char) expectedValue;
+            return expectedValue;
         if (scalarType.isInstance(expectedValue))
             return expectedValue;
         return null;
     }
 
-    private <T> Object numericValue(Number expectedValue, Class<?> type) {
+    private <T> Object numericValue(Number expectedValue, Class<T> type) {
         if (Byte.class.isAssignableFrom(type))
             return expectedValue.byteValue();
         if (Short.class.isAssignableFrom(type))
@@ -226,52 +232,77 @@ public abstract class AbstractMappingTest<B> {
     private <T> Optional<T> get(Scalar<B> scalar, Class<?> scalarType) {
         @SuppressWarnings("unchecked")
         Class<T> scalarT = (Class<T>) scalarType;
-        Optional<T> optional = scalar.get(object, scalarT);
-        return optional;
+        return scalar.get(object, scalarT);
     }
 
     @Test
     public void shouldGetIntArrayProperty() {
-        Property<B> property = whenGetProperty("intArrayProperty");
+        Property<B> property = getProperty("intArrayProperty");
 
         assertSequece(property, INT_LIST_VALUE, Integer.class);
     }
 
     @Test
     public void shouldGetIntegerListProperty() {
-        Property<B> property = whenGetProperty("intListProperty");
+        Property<B> property = getProperty("intListProperty");
 
         assertSequece(property, INT_LIST_VALUE, Integer.class);
     }
 
     @Test
     public void shouldGetStringListProperty() {
-        Property<B> property = whenGetProperty("stringListProperty");
+        Property<B> property = getProperty("stringListProperty");
 
         assertSequece(property, STRING_LIST_VALUE, String.class);
     }
 
     private <T> void assertSequece(Property<B> property, List<T> expectedValues, Class<T> type) {
-        Sequence<B> sequence = property.getSequence();
         int expectedSize = expectedValues.size();
-        then(sequence.size(object)).isEqualTo(expectedSize);
-        for (int i = 0; i < expectedSize; i++)
-            then(sequence.get(i).getScalar().get(object, type)).contains(expectedValues.get(i));
+        then(property.getSequence().size(object)).isEqualTo(expectedSize);
+        for (int i = 0; i < expectedSize; i++) {
+            then(property.getSequence().get(i).getScalar().get(object, type)).contains(expectedValues.get(i));
+            then(property.get(i).get(object, type)).contains(expectedValues.get(i));
+        }
+    }
+
+    @Test
+    public void shouldGetNestedSequenceSequence() {
+        Property<B> list = getProperty("nestedSequenceSequenceProperty");
+
+        assertThat(list.getKind()).isEqualTo(sequence);
+        assertThat(list.getSequence().size(object)).isEqualTo(2);
+
+        if (hasSchema())
+            assertThat(list.get(0).getKind()).isEqualTo(sequence); // may be unknown
+        assertThat(list.get(0).getSequence().size(object)).isEqualTo(2);
+
+        if (hasSchema())
+            assertThat(list.get(1).getKind()).isEqualTo(sequence);
+        assertThat(list.get(1).getSequence().size(object)).isEqualTo(3);
+
+        assertThat(list.get(0).get(0).get(object, String.class)).contains("A1");
+        assertThat(list.get(0).get(1).get(object, String.class)).contains("A2");
+        assertThat(list.get(1).get(0).get(object, String.class)).contains("B1");
+        assertThat(list.get(1).get(1).get(object, String.class)).contains("B2");
+        assertThat(list.get(1).get(2).get(object, String.class)).contains("B3");
+
+        assertThat(list.get(99).get(2).get(object, String.class)).isEmpty();
+        assertThat(list.get(1).get(99).get(object, String.class)).isEmpty();
     }
 
 
     @Test
     public void shouldGetNestedProperty() {
-        Property<B> property = whenGetProperty("nestedProperty").getProperty("nestedStringProperty");
+        Property<B> property = getProperty("nestedProperty").get("nestedStringProperty");
 
         assertScalar(property, "nestedString");
     }
 
     @Test
     public void shouldGetDoublyNestedProperty() {
-        Property<B> outer = whenGetProperty("nestingProperty");
-        Property<B> middle = outer.getProperty("nestedProperty");
-        Property<B> property = middle.getProperty("nestedStringProperty");
+        Property<B> outer = getProperty("nestingProperty");
+        Property<B> middle = outer.get("nestedProperty");
+        Property<B> property = middle.get("nestedStringProperty");
 
         assertScalar(property, "nestedString");
     }

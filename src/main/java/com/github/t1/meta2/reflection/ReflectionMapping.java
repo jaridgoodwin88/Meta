@@ -1,6 +1,7 @@
 package com.github.t1.meta2.reflection;
 
 import static java.util.Collections.*;
+import static java.util.function.Function.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -11,13 +12,9 @@ import com.github.t1.meta2.Mapping;
 import lombok.*;
 
 public class ReflectionMapping<B> implements Mapping<B> {
-    public static <B> ReflectionMapping<B> on(Class<B> type) {
-        return new ReflectionMapping<>(type, identity());
-    }
-
     @SuppressWarnings("unchecked")
-    public static <B, T> Function<B, T> identity() {
-        return self -> (T) self;
+    public static <B> ReflectionMapping<B> on(Class<B> type) {
+        return new ReflectionMapping<>(type, (Function<B, Object>) identity());
     }
 
     private final Map<String, FieldReflectionProperty<B>> properties;
@@ -53,7 +50,7 @@ public class ReflectionMapping<B> implements Mapping<B> {
 
         @Override
         protected Mapping<B> createMapping() {
-            return new ReflectionMapping<>(field.getType(), object -> get(object));
+            return new ReflectionMapping<>(field.getType(), this::get);
         }
     }
 
