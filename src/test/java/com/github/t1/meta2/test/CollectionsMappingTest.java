@@ -5,7 +5,7 @@ import static java.util.Arrays.*;
 import java.util.*;
 
 import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.reflection.CollectionsMapping;
+import com.github.t1.meta2.collections.CollectionsMapping;
 
 public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Object>> {
     @Override
@@ -51,7 +51,7 @@ public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Obje
 
     @Override
     protected Mapping<Map<String, Object>> createMapping() {
-        return CollectionsMapping.of(object);
+        return new CollectionsMapping<>();
     }
 
 }

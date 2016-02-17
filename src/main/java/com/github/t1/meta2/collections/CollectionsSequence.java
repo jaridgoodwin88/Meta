@@ -1,18 +1,16 @@
-package com.github.t1.meta2.json;
+package com.github.t1.meta2.collections;
 
-import static com.github.t1.meta2.json.JsonCast.*;
+import static com.github.t1.meta2.util.JavaCast.*;
 
 import java.util.Optional;
 import java.util.function.Function;
-
-import javax.json.*;
 
 import com.github.t1.meta2.*;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-class JsonSequence<B extends JsonValue> implements Sequence<B> {
+class CollectionsSequence<B> implements Sequence<B> {
     private final Function<B, B> backtrack;
 
     @Override
@@ -27,20 +25,17 @@ class JsonSequence<B extends JsonValue> implements Sequence<B> {
 
     @Override
     public Sequence<B> getSequence(int i) {
-        return new JsonSequence<>(object -> backtrack(object, i));
+        return new CollectionsSequence<>(object -> backtrack(object, i));
     }
 
     @Override
     public Mapping<B> getMapping(int i) {
-        return new JsonMapping<>(object -> backtrack(object, i));
+        return new CollectionsMapping<>(object -> backtrack(object, i));
     }
 
     private B backtrack(B object, int i) {
-        JsonArray array = (JsonArray) backtrack.apply(object);
-        if (array == null || i >= array.size())
-            return null;
-        @SuppressWarnings("unchecked")
-        B backtracked = (B) array.get(i);
-        return backtracked;
+        B sequence = backtrack.apply(object);
+        return getSequenceElement(sequence, i);
     }
+
 }

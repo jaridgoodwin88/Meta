@@ -2,34 +2,30 @@ package com.github.t1.meta2;
 
 import java.util.List;
 
+import com.github.t1.meta2.Structure.Property;
+
 /**
  * Projection of a number of distinct keys to corresponding values. A.k.a. Map, Dictionary, etc.
  */
 public interface Mapping<B> {
-    /** The key-value pair in a {@link Mapping}. */
-    interface Property<B> extends Item<B> {
-        String getName();
-    }
+    Scalar<B> getScalar(String name);
 
-    Property<B> getProperty(String name);
+    Sequence<B> getSequence(String name);
 
-    List<Property<B>> getProperties();
+    Mapping<B> getMapping(String name);
 
     /** convenience method */
-    default Scalar<B> getScalar(String name) {
-        return getProperty(name).getScalar();
+    default List<Property<B>> getProperties() {
+        return null; // TODO test and implement
     }
 
     /** convenience method */
-    default Sequence<B> getSequence(String name) {
-        return getProperty(name).getSequence();
-    }
-
     default Property<B> getPropertyPath(String path) {
-        String[] elements = path.split("/");
-        Property<B> property = this.getProperty(elements[0]);
-        for (int i = 1; i < elements.length; i++)
-            property = property.get(elements[i]);
-        return property;
+        return null; // TODO test and implement
+    }
+
+    /** convenience method */
+    default Property<B> getProperty(String name) {
+        return null; // TODO test and implement
     }
 }

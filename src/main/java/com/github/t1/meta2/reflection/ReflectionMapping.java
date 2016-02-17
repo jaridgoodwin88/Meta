@@ -1,15 +1,15 @@
 package com.github.t1.meta2.reflection;
 
-import static java.util.Collections.*;
+import static com.github.t1.meta2.util.JavaCast.*;
 import static java.util.function.Function.*;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Optional;
 import java.util.function.Function;
 
-import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.*;
 
-import lombok.*;
+import lombok.SneakyThrows;
 
 public class ReflectionMapping<B> implements Mapping<B> {
     @SuppressWarnings("unchecked")
@@ -17,51 +17,44 @@ public class ReflectionMapping<B> implements Mapping<B> {
         return new ReflectionMapping<>(type, (Function<B, Object>) identity());
     }
 
-    private final Map<String, FieldReflectionProperty<B>> properties;
+    private Class<?> type;
+    private Function<B, Object> backtrack;
 
     private ReflectionMapping(Class<?> type, Function<B, Object> backtrack) {
-        this.properties = new LinkedHashMap<>();
-        for (Field field : type.getDeclaredFields())
-            properties.put(field.getName(), new FieldReflectionProperty<>(field, backtrack));
-    }
-
-    @ToString
-    private static class FieldReflectionProperty<B> extends ObjectProperty<B> {
-        private final Field field;
-        private final Function<B, Object> backtrack;
-
-        public FieldReflectionProperty(Field field, Function<B, Object> backtrack) {
-            super(field.getType(), field.getName());
-            this.field = field;
-            this.field.setAccessible(true);
-            this.backtrack = backtrack;
-        }
-
-        @Override
-        public String getName() {
-            return field.getName();
-        }
-
-        @Override
-        @SneakyThrows(IllegalAccessException.class)
-        protected Object get(B object) {
-            return field.get(backtrack.apply(object));
-        }
-
-        @Override
-        protected Mapping<B> createMapping() {
-            return new ReflectionMapping<>(field.getType(), this::get);
-        }
+        this.type = type;
+        this.backtrack = backtrack;
     }
 
     @Override
-    public Property<B> getProperty(String name) {
-        return properties.get(name);
+    public Scalar<B> getScalar(String name) {
+        return new Scalar<B>() {
+            @Override
+            public <T> Optional<T> get(B object, Class<T> type) {
+                return Optional.of(cast(backtrack(object, name), type));
+            }
+        };
     }
 
     @Override
-    public List<Property<B>> getProperties() {
-        return unmodifiableList(new ArrayList<>(properties.values()));
+    public Sequence<B> getSequence(String name) {
+        return new ReflectionSequence<>(object -> backtrack(object, name));
     }
 
+    @Override
+    public Mapping<B> getMapping(String name) {
+        return new ReflectionMapping<>(type, object -> backtrack(object, name));
+    }
+
+    @SuppressWarnings("unchecked")
+    @SneakyThrows(ReflectiveOperationException.class)
+    private <T> T backtrack(Object object, String name) {
+        return (T) getField(name).get(backtrack.apply((B) object));
+    }
+
+    @SneakyThrows(ReflectiveOperationException.class)
+    private Field getField(String name) {
+        Field field = type.getDeclaredField(name);
+        field.setAccessible(true);
+        return field;
+    }
 }

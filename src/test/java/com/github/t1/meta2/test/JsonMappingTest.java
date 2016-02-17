@@ -1,6 +1,6 @@
 package com.github.t1.meta2.test;
 
-import static com.github.t1.meta2.json.JsonArrayCollector.*;
+import static com.github.t1.meta2.util.JsonArrayCollector.*;
 import static org.junit.Assume.*;
 
 import java.util.stream.IntStream;
@@ -30,9 +30,9 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
         json.add("floatProperty", FLOAT_VALUE);
         json.add("doubleProperty", DOUBLE_VALUE);
 
-        json.add("intArrayProperty", IntStream.of(INT_ARRAY_VALUE).boxed().collect(asJsonArray()));
-        json.add("intListProperty", INT_LIST_VALUE.stream().collect(asJsonArray()));
-        json.add("stringListProperty", STRING_LIST_VALUE.stream().collect(asJsonArray()));
+        json.add("intArrayProperty", IntStream.of(INT_ARRAY_VALUE).boxed().collect(toJsonArray()));
+        json.add("intListProperty", INT_LIST_VALUE.stream().collect(toJsonArray()));
+        json.add("stringListProperty", STRING_LIST_VALUE.stream().collect(toJsonArray()));
         json.add("nestedSequenceSequenceProperty", Json.createArrayBuilder()
                 .add(Json.createArrayBuilder().add("A1").add("A2"))
                 .add(Json.createArrayBuilder().add("B1").add("B2").add("B3")));
@@ -51,7 +51,7 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
 
     @Override
     protected Mapping<JsonObject> createMapping() {
-        return JsonMapping.of(object);
+        return new JsonMapping<>();
     }
 
     @Override

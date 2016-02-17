@@ -1,4 +1,4 @@
-package com.github.t1.meta2.json;
+package com.github.t1.meta2.util;
 
 import static java.util.Collections.*;
 
@@ -8,14 +8,17 @@ import java.util.stream.Collector;
 
 import javax.json.*;
 
+/**
+ * A {@link Collector} into a {@link JsonArray}. Usage: <code>myStream.collect(asJsonArray())</code>
+ */
 public class JsonArrayCollector<T> implements Collector<T, JsonArrayBuilder, JsonArray> {
-    public static <T> Collector<T, JsonArrayBuilder, JsonArray> asJsonArray() {
+    public static <T> Collector<T, JsonArrayBuilder, JsonArray> toJsonArray() {
         return new JsonArrayCollector<>();
     }
 
     @Override
     public Supplier<JsonArrayBuilder> supplier() {
-        return () -> Json.createArrayBuilder();
+        return Json::createArrayBuilder;
     }
 
     @Override
@@ -31,14 +34,14 @@ public class JsonArrayCollector<T> implements Collector<T, JsonArrayBuilder, Jso
     @Override
     public BinaryOperator<JsonArrayBuilder> combiner() {
         return (left, right) -> {
-            right.build().forEach(value -> left.add(value));
+            right.build().forEach(left::add);
             return left;
         };
     }
 
     @Override
     public Function<JsonArrayBuilder, JsonArray> finisher() {
-        return builder -> builder.build();
+        return JsonArrayBuilder::build;
     }
 
     @Override
