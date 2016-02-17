@@ -2,40 +2,29 @@ package com.github.t1.meta2.reflection;
 
 import static com.github.t1.meta2.util.JavaCast.*;
 
-import java.util.Optional;
 import java.util.function.Function;
 
-import com.github.t1.meta2.*;
+import com.github.t1.meta2.AbstractSequence;
+import com.github.t1.meta2.util.JavaCast;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-public class ReflectionSequence<B> implements Sequence<B> {
-    private final Function<B, B> backtrack;
-
-    @Override
-    public Mapping<B> getMapping(int i) {
-        return null; // TODO test and implement
+public class ReflectionSequence<B> extends AbstractSequence<B> {
+    public ReflectionSequence(Class<B> type, Function<B, B> backtrack) {
+        super(backtrack,
+                b -> new ReflectionSequence<>(type, b),
+                b -> new ReflectionMapping<>(type, b));
+        this.type = type;
     }
 
-    @Override
-    public Sequence<B> getSequence(int i) {
-        return new ReflectionSequence<>(object -> backtrack(object, i));
-    }
-
-    @Override
-    public Scalar<B> getScalar(int i) {
-        return new Scalar<B>() {
-            @Override
-            public <T> Optional<T> get(B object, Class<T> type) {
-                return Optional.ofNullable(cast(backtrack(object, i), type));
-            }
-        };
-    }
+    private final Class<?> type;
 
     @SuppressWarnings("unchecked")
-    private <T> T backtrack(B object, int i) {
+    protected <T> T backtrack(B object, int i) {
         T sequence = (T) backtrack.apply(object);
         return getSequenceElement(sequence, i);
+    }
+
+    @Override
+    protected <T> T cast(Object object, Class<T> type) {
+        return JavaCast.cast(object, type);
     }
 }

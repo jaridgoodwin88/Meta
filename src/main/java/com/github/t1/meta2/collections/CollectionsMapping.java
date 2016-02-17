@@ -1,47 +1,30 @@
 package com.github.t1.meta2.collections;
 
-import static com.github.t1.meta2.util.JavaCast.*;
 import static java.util.function.Function.*;
 
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 
-import com.github.t1.meta2.*;
+import com.github.t1.meta2.AbstractMapping;
+import com.github.t1.meta2.util.JavaCast;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-public class CollectionsMapping<B> implements Mapping<B> {
+public class CollectionsMapping<B> extends AbstractMapping<B> {
     public CollectionsMapping() {
         this(identity());
     }
 
-    private final Function<B, B> backtrack;
-
-    @Override
-    public Scalar<B> getScalar(String name) {
-        return new Scalar<B>() {
-            @Override
-            public <T> Optional<T> get(B object, Class<T> type) {
-                return Optional.ofNullable(cast(backtrack(object, name), type));
-            }
-        };
-    }
-
-    @Override
-    public Sequence<B> getSequence(String name) {
-        return new CollectionsSequence<>(object -> backtrack(object, name));
-    }
-
-    @Override
-    public Mapping<B> getMapping(String name) {
-        return new CollectionsMapping<>(object -> backtrack(object, name));
+    public CollectionsMapping(Function<B, B> backtrack) {
+        super(backtrack, CollectionsSequence::new, CollectionsMapping::new);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T backtrack(Object object, String name) {
-        Map<String, ?> backtracked = (Map<String, ?>) backtrack.apply((B) object);
+    protected <T> T backtrack(B object, String name) {
+        Map<String, ?> backtracked = (Map<String, ?>) backtrack.apply(object);
         return (backtracked == null) ? null : (T) backtracked.get(name);
     }
 
+    @Override
+    protected <T> T cast(Object object, Class<T> type) {
+        return JavaCast.cast(object, type);
+    }
 }
