@@ -7,8 +7,7 @@ import java.util.stream.IntStream;
 
 import javax.json.*;
 
-import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.json.JsonMeta;
+import com.github.t1.meta2.*;
 
 public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     @Override

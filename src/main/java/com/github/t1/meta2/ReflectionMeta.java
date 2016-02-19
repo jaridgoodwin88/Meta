@@ -1,11 +1,10 @@
-package com.github.t1.meta2.reflection;
+package com.github.t1.meta2;
 
 import static java.util.function.Function.*;
 
 import java.lang.reflect.Field;
 import java.util.function.*;
 
-import com.github.t1.meta2.*;
 import com.github.t1.meta2.util.JavaCast;
 
 import lombok.SneakyThrows;
@@ -15,7 +14,8 @@ public class ReflectionMeta {
         return new ReflectionMapping<>(type, identity());
     }
 
-    private static class ReflectionSequence<B> extends MetaFactory.AbstractSequence<B> {
+    private static class ReflectionSequence<B> extends AbstractContainer<B, Integer>
+            implements Sequence<B> {
         public ReflectionSequence(Class<B> type, Function<B, B> backtrack) {
             super(backtrack,
                     JavaCast::cast,
@@ -25,7 +25,7 @@ public class ReflectionMeta {
         }
     }
 
-    private static class ReflectionMapping<B> extends MetaFactory.AbstractMapping<B> {
+    private static class ReflectionMapping<B> extends AbstractContainer<B, String> implements Mapping<B> {
         public ReflectionMapping(Class<B> type, Function<B, B> backtrack) {
             super(backtrack,
                     JavaCast::cast,

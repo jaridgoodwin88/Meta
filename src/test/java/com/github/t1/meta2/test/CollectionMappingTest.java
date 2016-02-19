@@ -4,8 +4,7 @@ import static java.util.Arrays.*;
 
 import java.util.*;
 
-import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.collections.CollectionMeta;
+import com.github.t1.meta2.*;
 
 public class CollectionMappingTest extends AbstractMappingTest<Map<String, ?>> {
     @Override

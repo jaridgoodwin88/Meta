@@ -6,8 +6,7 @@ import java.util.List;
 
 import org.junit.*;
 
-import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.reflection.ReflectionMeta;
+import com.github.t1.meta2.*;
 
 import lombok.RequiredArgsConstructor;
 

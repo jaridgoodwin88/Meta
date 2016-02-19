@@ -1,11 +1,10 @@
-package com.github.t1.meta2.collections;
+package com.github.t1.meta2;
 
 import static java.util.function.Function.*;
 
 import java.util.Map;
 import java.util.function.Function;
 
-import com.github.t1.meta2.*;
 import com.github.t1.meta2.util.JavaCast;
 
 public class CollectionMeta {
@@ -17,7 +16,8 @@ public class CollectionMeta {
         return new CollectionMapping<>(identity());
     }
 
-    private static class CollectionSequence<B> extends MetaFactory.AbstractSequence<B> {
+    private static class CollectionSequence<B> extends AbstractContainer<B, Integer>
+            implements Sequence<B> {
         public CollectionSequence(Function<B, B> backtrack) {
             super(
                     backtrack,
@@ -28,7 +28,7 @@ public class CollectionMeta {
         }
     }
 
-    private static class CollectionMapping<B> extends MetaFactory.AbstractMapping<B> {
+    private static class CollectionMapping<B> extends AbstractContainer<B, String> implements Mapping<B> {
         public CollectionMapping(Function<B, B> backtrack) {
             super(backtrack, JavaCast::cast, CollectionSequence::new, CollectionMapping::new,
                     (object, name) -> {

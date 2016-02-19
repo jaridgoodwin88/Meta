@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.t1</groupId>
@@ -59,7 +59,9 @@
                     </compilerArguments>
                     <!-- for the tests, it has been built, so we can add it to lombok: -->
                     <testCompilerArguments>
-                        <processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor,com.github.t1.meta.MetaAnnotationProcessor</processor>
+                        <processor>
+                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor,com.github.t1.meta.MetaAnnotationProcessor
+                        </processor>
                     </testCompilerArguments>
                 </configuration>
             </plugin>
@@ -123,7 +125,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-        
+
         <!-- optional scope -->
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -142,6 +144,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
         </dependency>
 
         <!-- test scope -->

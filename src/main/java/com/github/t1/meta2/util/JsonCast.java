@@ -1,4 +1,4 @@
-package com.github.t1.meta2.json;
+package com.github.t1.meta2.util;
 
 import static javax.json.JsonValue.ValueType.*;
 
