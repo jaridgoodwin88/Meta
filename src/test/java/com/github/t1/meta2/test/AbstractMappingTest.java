@@ -1,6 +1,6 @@
 package com.github.t1.meta2.test;
 
-import static com.github.t1.meta2.Structure.StructureKind.*;
+import static com.github.t1.meta2.Structure.Kind.*;
 import static com.github.t1.meta2.util.JavaCast.*;
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
@@ -16,7 +16,7 @@ import org.assertj.core.groups.Tuple;
 import org.junit.*;
 
 import com.github.t1.meta2.*;
-import com.github.t1.meta2.Structure.*;
+import com.github.t1.meta2.Structure.Property;
 
 public abstract class AbstractMappingTest<B> {
     public static final String STRING_VALUE = "stringValue";
@@ -34,8 +34,6 @@ public abstract class AbstractMappingTest<B> {
     public static final List<Integer> INT_LIST_VALUE = IntStream.of(INT_ARRAY_VALUE).boxed().collect(toList());
     public static final List<String> STRING_LIST_VALUE = asList("one", "two", "three");
     private static final int OUT_OF_INDEX = 99;
-
-    protected abstract boolean hasSchema();
 
     protected abstract B createObject();
 
@@ -71,8 +69,8 @@ public abstract class AbstractMappingTest<B> {
                         tuple("nestedSequenceSequenceProperty", sequence),
                         tuple("nestedMappingSequenceProperty", sequence),
 
-                        tuple("nestedProperty", StructureKind.mapping),
-                        tuple("nestingProperty", StructureKind.mapping));
+                        tuple("nestedProperty", Structure.Kind.mapping),
+                        tuple("nestingProperty", Structure.Kind.mapping));
     }
 
     @Test
@@ -92,7 +90,7 @@ public abstract class AbstractMappingTest<B> {
         List<Property<B>> properties = mapping.getMapping("nestingProperty").getProperties();
 
         then(properties).extracting(this::nameAndKind)
-                .containsExactly(tuple("nestedProperty", StructureKind.mapping));
+                .containsExactly(tuple("nestedProperty", Structure.Kind.mapping));
 
         List<Property<B>> nestedProperties =
                 mapping.getPropertyPath("nestingProperty/nestedProperty").getMapping().getProperties();

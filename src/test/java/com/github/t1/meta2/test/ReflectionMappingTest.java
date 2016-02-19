@@ -11,11 +11,6 @@ import com.github.t1.meta2.*;
 import lombok.RequiredArgsConstructor;
 
 public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionMappingTest.Pojo> {
-    @Override
-    protected boolean hasSchema() {
-        return false; // TODO should be true
-    }
-
     // TODO ignore static fields
     // TODO ignore transient fields
     public static class Pojo {

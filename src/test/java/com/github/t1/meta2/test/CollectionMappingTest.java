@@ -8,11 +8,6 @@ import com.github.t1.meta2.*;
 
 public class CollectionMappingTest extends AbstractMappingTest<Map<String, ?>> {
     @Override
-    protected boolean hasSchema() {
-        return false;
-    }
-
-    @Override
     protected Map<String, ?> createObject() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("stringProperty", STRING_VALUE);

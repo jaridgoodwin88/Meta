@@ -11,11 +11,6 @@ import com.github.t1.meta2.*;
 
 public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     @Override
-    protected boolean hasSchema() {
-        return false;
-    }
-
-    @Override
     protected JsonObject createObject() {
         JsonObjectBuilder json = Json.createObjectBuilder();
         json.add("stringProperty", STRING_VALUE);

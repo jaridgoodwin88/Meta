@@ -1,12 +1,12 @@
 package com.github.t1.meta2;
 
-import static com.github.t1.meta2.Structure.StructureKind.*;
+import static com.github.t1.meta2.Structure.Kind.*;
 
 /**
  * The structure or schema of an object.
  */
 public class Structure {
-    public enum StructureKind { // TODO rename to Kind
+    public enum Kind {
         scalar,
         sequence,
         mapping
@@ -24,9 +24,9 @@ public class Structure {
 
     /** Either a {@link Property} or an {@link Element} */
     interface Item<B> {
-        StructureKind getKind();
+        Structure.Kind getKind();
 
-        default void checkKind(StructureKind expected) {
+        default void checkKind(Structure.Kind expected) {
             if (getKind() != expected)
                 throw new IllegalStateException(this + " is a " + getKind() + ", not a " + expected);
         }
