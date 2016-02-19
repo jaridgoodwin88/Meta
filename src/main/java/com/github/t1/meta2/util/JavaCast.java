@@ -13,23 +13,23 @@ public class JavaCast {
             int.class, long.class, float.class, double.class);
 
     /**
-     * Cast a value to a type, even if that means converting, e.g., a Long into a String (and much more).
+     * Cast a value to a targetType, even if that means converting, e.g., a Long into a String (and much more).
      */
     @SuppressWarnings("ChainOfInstanceofChecks")
-    public static <T> T cast(Object value, Class<T> type) {
+    public static <T> T cast(Object value, Class<T> targetType) {
         if (value == null)
             return null;
-        if (Number.class.isAssignableFrom(type) && value instanceof Number)
-            return numericCast((Number) value, type);
-        if (Number.class.isAssignableFrom(type) && value instanceof Character)
-            return numericCast((short) (char) value, type);
-        if (Character.class.isAssignableFrom(type) && value instanceof Number)
+        if (Number.class.isAssignableFrom(targetType) && value instanceof Number)
+            return numericCast((Number) value, targetType);
+        if (Number.class.isAssignableFrom(targetType) && value instanceof Character)
+            return numericCast((short) (char) value, targetType);
+        if (Character.class.isAssignableFrom(targetType) && value instanceof Number)
             return charCast(value);
-        if (CharSequence.class.isAssignableFrom(type) && value instanceof Character)
-            return type.cast(Integer.toString((char) value));
-        if (CharSequence.class.isAssignableFrom(type))
+        if (CharSequence.class.isAssignableFrom(targetType) && value instanceof Character)
+            return targetType.cast(Integer.toString((char) value));
+        if (CharSequence.class.isAssignableFrom(targetType))
             value = value.toString();
-        return type.cast(value);
+        return targetType.cast(value);
     }
 
     @SuppressWarnings("unchecked")

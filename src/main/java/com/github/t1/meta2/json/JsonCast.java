@@ -5,8 +5,8 @@ import static javax.json.JsonValue.ValueType.*;
 import javax.json.*;
 
 public class JsonCast {
-    public static <T> T cast(JsonValue value, Class<T> targetType) {
-        return targetType.cast(innerCast(value, targetType));
+    public static <T> T cast(Object value, Class<T> targetType) {
+        return targetType.cast(innerCast((JsonValue) value, targetType));
     }
 
     private static Object innerCast(JsonValue value, Class<?> targetType) {

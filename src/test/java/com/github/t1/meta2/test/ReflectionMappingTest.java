@@ -6,7 +6,8 @@ import java.util.List;
 
 import org.junit.*;
 
-import com.github.t1.meta2.reflection.ReflectionMapping;
+import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.reflection.ReflectionMeta;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,8 +59,8 @@ public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.met
     }
 
     @Override
-    protected ReflectionMapping<Pojo> createMapping() {
-        return ReflectionMapping.on(Pojo.class);
+    protected Mapping<Pojo> createMapping() {
+        return ReflectionMeta.mapping(Pojo.class);
     }
 
     // TODO pull this up

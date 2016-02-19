@@ -5,16 +5,16 @@ import static java.util.Arrays.*;
 import java.util.*;
 
 import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.collections.CollectionsMapping;
+import com.github.t1.meta2.collections.CollectionMeta;
 
-public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Object>> {
+public class CollectionsMappingTest extends AbstractMappingTest<Map<String, ?>> {
     @Override
     protected boolean hasSchema() {
         return false;
     }
 
     @Override
-    protected Map<String, Object> createObject() {
+    protected Map<String, ?> createObject() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("stringProperty", STRING_VALUE);
         map.put("booleanProperty", BOOLEAN_VALUE);
@@ -50,8 +50,7 @@ public class CollectionsMappingTest extends AbstractMappingTest<Map<String, Obje
     }
 
     @Override
-    protected Mapping<Map<String, Object>> createMapping() {
-        return new CollectionsMapping<>();
+    protected Mapping<Map<String, ?>> createMapping() {
+        return CollectionMeta.mapping();
     }
-
 }
