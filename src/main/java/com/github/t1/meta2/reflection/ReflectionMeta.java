@@ -1,10 +1,9 @@
 package com.github.t1.meta2.reflection;
 
-import static com.github.t1.meta2.util.JavaCast.*;
 import static java.util.function.Function.*;
 
 import java.lang.reflect.Field;
-import java.util.function.Function;
+import java.util.function.*;
 
 import com.github.t1.meta2.*;
 import com.github.t1.meta2.util.JavaCast;
@@ -21,11 +20,8 @@ public class ReflectionMeta {
             super(backtrack,
                     JavaCast::cast,
                     b -> new ReflectionSequence<>(type, b),
-                    b -> new ReflectionMapping<>(type, b));
-            this.resolve = (object, i) -> {
-                Object sequence = backtrack.apply(object);
-                return getSequenceElement(sequence, i);
-            };
+                    b -> new ReflectionMapping<>(type, b),
+                    JavaCast::getSequenceElement);
         }
     }
 
@@ -34,23 +30,21 @@ public class ReflectionMeta {
             super(backtrack,
                     JavaCast::cast,
                     b -> new ReflectionSequence<>(type, b),
-                    b -> new ReflectionMapping<>(type, b));
-            this.resolve = this::backtrack;
-            this.type = type;
-        }
+                    b -> new ReflectionMapping<>(type, b),
+                    new BiFunction<B, String, B>() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        @SneakyThrows(ReflectiveOperationException.class)
+                        public B apply(B object, String name) {
+                            return (B) getField(name).get(object);
+                        }
 
-        private final Class<?> type;
-
-        @SuppressWarnings("unchecked")
-        @SneakyThrows(ReflectiveOperationException.class)
-        protected <T> T backtrack(B object, String name) {
-            return (T) getField(name).get(backtrack.apply(object));
-        }
-
-        private Field getField(String name) throws NoSuchFieldException {
-            Field field = type.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
+                        private Field getField(String name) throws NoSuchFieldException {
+                            Field field = type.getDeclaredField(name);
+                            field.setAccessible(true);
+                            return field;
+                        }
+                    });
         }
     }
 }

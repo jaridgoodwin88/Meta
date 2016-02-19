@@ -7,7 +7,7 @@ import java.util.*;
 import com.github.t1.meta2.Mapping;
 import com.github.t1.meta2.collections.CollectionMeta;
 
-public class CollectionsMappingTest extends AbstractMappingTest<Map<String, ?>> {
+public class CollectionMappingTest extends AbstractMappingTest<Map<String, ?>> {
     @Override
     protected boolean hasSchema() {
         return false;
