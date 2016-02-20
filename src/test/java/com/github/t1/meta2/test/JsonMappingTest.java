@@ -54,11 +54,6 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
     }
 
     @Override
-    public void shouldGetNestingProperties() {
-        assumeTrue(false);
-    }
-
-    @Override
     public void shouldGetNestedProperty() {
         assumeTrue(false);
     }

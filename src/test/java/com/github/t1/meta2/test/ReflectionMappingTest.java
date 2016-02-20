@@ -11,6 +11,11 @@ import com.github.t1.meta2.*;
 import lombok.RequiredArgsConstructor;
 
 public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionMappingTest.Pojo> {
+    @Override
+    protected boolean hasSchema() {
+        return true;
+    }
+
     // TODO ignore static fields
     // TODO ignore transient fields
     public static class Pojo {
@@ -33,7 +38,6 @@ public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.met
         List<NestedPojo> nestedMappingSequenceProperty = asList(new NestedPojo("A"), new NestedPojo("B"));
         NestedPojo nestedProperty = new NestedPojo("nestedString");
         NestingPojo nestingProperty = new NestingPojo();
-
     }
 
     @RequiredArgsConstructor

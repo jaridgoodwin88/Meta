@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.BDDAssertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.*;
+import static org.junit.Assume.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -35,18 +36,22 @@ public abstract class AbstractMappingTest<B> {
     public static final List<String> STRING_LIST_VALUE = asList("one", "two", "three");
     private static final int OUT_OF_INDEX = 99;
 
-    protected abstract B createObject();
-
-    protected abstract Mapping<B> createMapping();
-
     B object = createObject();
+
+    protected abstract B createObject();
 
     Mapping<B> mapping = createMapping();
 
+    protected abstract Mapping<B> createMapping();
+
+    protected boolean hasSchema() {
+        return false;
+    }
 
     @Test
-    @Ignore
     public void shouldGetProperties() {
+        assumeTrue(hasSchema());
+
         List<Property<B>> properties = mapping.getProperties();
 
         then(properties)
@@ -74,8 +79,9 @@ public abstract class AbstractMappingTest<B> {
     }
 
     @Test
-    @Ignore
     public void shouldGetNestedProperties() {
+        assumeTrue(hasSchema());
+
         List<Property<B>> properties = mapping.getMapping("nestedProperty").getProperties();
 
         then(properties)
@@ -86,14 +92,16 @@ public abstract class AbstractMappingTest<B> {
 
     @Test
     @Ignore
-    public void shouldGetNestingProperties() {
+    public void shouldGetDoublyNestedProperties() {
+        assumeTrue(hasSchema());
+
         List<Property<B>> properties = mapping.getMapping("nestingProperty").getProperties();
 
         then(properties).extracting(this::nameAndKind)
                 .containsExactly(tuple("nestedProperty", Structure.Kind.mapping));
 
-        List<Property<B>> nestedProperties =
-                mapping.getPropertyPath("nestingProperty/nestedProperty").getMapping().getProperties();
+        Structure.Path<B> path = mapping.getPath("nestingProperty/nestedProperty");
+        List<Property<B>> nestedProperties = path.getMapping().getProperties();
 
         then(nestedProperties).extracting(this::nameAndKind)
                 .containsExactly(tuple("nestedStringProperty", scalar));
@@ -105,7 +113,7 @@ public abstract class AbstractMappingTest<B> {
 
 
     protected Property<B> getProperty(String name) {
-        Property<B> property = mapping.getProperty(name);
+        Property<B> property = mapping.getProperty(name).get();
 
         then(property).isNotNull();
         then(property.getName()).isEqualTo(name);
@@ -310,8 +318,8 @@ public abstract class AbstractMappingTest<B> {
     @Test
     @Ignore
     public void shouldGetPropertyPath() {
-        Property<B> property = mapping.getPropertyPath("nestingProperty/nestedProperty/nestedStringProperty");
-
-        assertScalar(property.getScalar(), "nestedString");
+        // TODO Property<B> property = mapping.getPropertyPath("nestingProperty/nestedProperty/nestedStringProperty");
+        //
+        // assertScalar(property.getScalar(), "nestedString");
     }
 }

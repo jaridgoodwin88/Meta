@@ -6,19 +6,19 @@ import java.util.function.*;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class AbstractContainer<B, N> implements Container<B, N> {
+public abstract class AbstractContainer<B, K> implements Container<B, K> {
     protected final Function<B, B> backtrack;
     protected final BiFunction<Object, Class<?>, ?> cast;
     protected final Function<Function<B, B>, Sequence<B>> sequenceFactory;
     protected final Function<Function<B, B>, Mapping<B>> mappingFactory;
-    protected final BiFunction<B, N, B> resolve;
+    protected final BiFunction<B, K, B> resolve;
 
     @Override
-    public Scalar<B> getScalar(N i) {
+    public Scalar<B> getScalar(K key) {
         return new Scalar<B>() {
             @Override
             public <T> Optional<T> get(B object, Class<T> type) {
-                return Optional.ofNullable(cast(resolve(object, i), type));
+                return Optional.ofNullable(cast(resolve(object, key), type));
             }
 
             private <T> T cast(B backtracked, Class<T> type) {
@@ -28,17 +28,17 @@ public abstract class AbstractContainer<B, N> implements Container<B, N> {
     }
 
     @Override
-    public Sequence<B> getSequence(N i) {
-        return sequenceFactory.apply(object -> resolve(object, i));
+    public Sequence<B> getSequence(K key) {
+        return sequenceFactory.apply(object -> resolve(object, key));
     }
 
     @Override
-    public Mapping<B> getMapping(N i) {
-        return mappingFactory.apply(object -> resolve(object, i));
+    public Mapping<B> getMapping(K key) {
+        return mappingFactory.apply(object -> resolve(object, key));
     }
 
-    protected B resolve(B object, N i) {
+    protected B resolve(B object, K key) {
         object = backtrack.apply(object);
-        return resolve.apply(object, i);
+        return resolve.apply(object, key);
     }
 }
