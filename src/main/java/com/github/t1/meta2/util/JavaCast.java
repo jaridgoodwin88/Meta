@@ -1,9 +1,8 @@
 package com.github.t1.meta2.util;
 
-import static java.util.Arrays.*;
-
-import java.lang.reflect.Array;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class JavaCast {
     public static final List<Class<?>> PRIMITIVE_WRAPPER_SCALARS =
@@ -52,24 +51,5 @@ public class JavaCast {
     @SuppressWarnings("unchecked")
     public static <T> T charCast(Object value) {
         return (T) (Character) (char) ((Number) value).shortValue();
-    }
-
-    /** @return the <code>i</code>th element of an array or List object. */
-    public static <T> T getSequenceElement(Object sequence, int i) {
-        if (sequence == null)
-            return null;
-        if (sequence instanceof List) {
-            List<?> list = (List<?>) sequence;
-            if (i >= list.size())
-                return null;
-            @SuppressWarnings("unchecked")
-            T backtracked = (T) list.get(i);
-            return backtracked;
-        }
-        if (i >= Array.getLength(sequence))
-            return null;
-        @SuppressWarnings("unchecked")
-        T backtracked = (T) Array.get(sequence, i);
-        return backtracked;
     }
 }

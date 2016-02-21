@@ -1,15 +1,16 @@
 package com.github.t1.meta2.test;
 
-import static java.util.Arrays.*;
+import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.ReflectionMeta;
+import lombok.RequiredArgsConstructor;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.*;
+import static java.util.Arrays.asList;
 
-import com.github.t1.meta2.*;
-
-import lombok.RequiredArgsConstructor;
-
+@SuppressWarnings("unused")
 public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.meta2.test.ReflectionMappingTest.Pojo> {
     @Override
     protected boolean hasSchema() {
@@ -35,20 +36,28 @@ public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.met
         List<String> stringListProperty = STRING_LIST_VALUE;
         List<List<String>> nestedSequenceSequenceProperty = asList(asList("A1", "A2"), asList("B1", "B2", "B3"));
 
-        List<NestedPojo> nestedMappingSequenceProperty = asList(new NestedPojo("A"), new NestedPojo("B"));
-        NestedPojo nestedProperty = new NestedPojo("nestedString");
+        List<NestedPojo> nestedMappingSequenceProperty = asList(new NestedPojo("A", 0), new NestedPojo("B", 1));
+        NestedPojo nestedProperty = new NestedPojo("nestedString", INTEGER_VALUE);
         NestingPojo nestingProperty = new NestingPojo();
+        OuterNestingPojo outerNestingProperty = new OuterNestingPojo();
     }
 
     @RequiredArgsConstructor
     public static class NestedPojo {
         final String nestedStringProperty;
-
+        final Integer nestedIntegerProperty;
+        final List<String> nestedSequenceProperty = STRING_LIST_VALUE;
     }
 
     public static class NestingPojo {
-        NestedPojo nestedProperty = new NestedPojo("nestedString");
+        NestedPojo nested0 = new NestedPojo("nestedString0", 0);
+        NestedPojo nested1 = new NestedPojo("nestedString1", 1);
+    }
 
+    public static class OuterNestingPojo {
+        NestingPojo nestingPojo = new NestingPojo();
+        List<NestingPojo> nestingPojoList = asList(new NestingPojo(), new NestingPojo());
+        NestedPojo[] nestedPojoArray = { new NestedPojo("A", 0), new NestedPojo("B", 1) };
     }
 
     @Override

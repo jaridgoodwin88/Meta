@@ -1,11 +1,13 @@
 package com.github.t1.meta2;
 
-import static com.github.t1.meta2.Structure.Kind.*;
+import com.github.t1.meta2.util.JsonArrayCollector;
+import lombok.NonNull;
+import lombok.Value;
 
 import java.nio.file.InvalidPathException;
-import java.util.List;
 
-import lombok.Value;
+import static com.github.t1.meta2.Structure.Kind.*;
+import static java.util.Arrays.asList;
 
 /**
  * The structure or schema of an object.
@@ -32,6 +34,7 @@ public class Structure {
     }
 
     /** Either a {@link Property} or an {@link Element} */
+    // TODO remove Item... it's useless, as properties can be derived from the structure, but elements require an instance
     interface Item<B, K> {
         Structure.Kind getKind();
 
@@ -63,22 +66,40 @@ public class Structure {
     }
 
     @Value
-    public static class Path<B> {
-        private final Container<B, ?> root;
-        private final List<String> path;
+    public static class Path {
+        public static final Path ROOT = new Path(null, null);
 
         /**
+         * @param path A <code>/</code>-separated list of container expression,
+         *             i.e. Integers for sequence element indexes an/or Strings for mapping property names.
+         * @return a path of access objects, which may be invalid when there's no {@link Structure} available, but never <code>null</code>.
          * @throws InvalidPathException when there <em>is</em> a {@link Structure} available, but not valid for this path expression.
          */
-        public Path(Container<B, ?> root, List<String> path) {
-            this.root = root;
-            this.path = path;
-            if (true)
-                throw new InvalidPathException(path.toString(), "invalid");
+        private static Structure.Path of(String path) {
+            return asList(path.split("/")).stream()
+                    .reduce(ROOT,
+                            Path::with,
+                            JsonArrayCollector::neverCombine);
         }
 
-        public Mapping<B> getMapping() {
-            return null;
+        private final Path parent;
+        private final String key;
+
+        public Path with(@NonNull Object key) {
+            if (this.equals(ROOT))
+                return new Path(null, key.toString());
+            else
+                return new Path(this, key.toString());
+        }
+
+        public String toString() {
+            StringBuilder out = new StringBuilder();
+            if (parent != null)
+                out.append(parent);
+            out.append("/");
+            if (key != null)
+                out.append(key);
+            return out.toString();
         }
     }
 }

@@ -1,23 +1,28 @@
 package com.github.t1.meta2.test;
 
-import static com.github.t1.meta2.Structure.Kind.*;
-import static com.github.t1.meta2.util.JavaCast.*;
-import static java.util.Arrays.*;
-import static java.util.stream.Collectors.*;
+import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.Scalar;
+import com.github.t1.meta2.Sequence;
+import com.github.t1.meta2.Structure;
+import com.github.t1.meta2.Structure.Property;
+import org.assertj.core.groups.Tuple;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
+
+import static com.github.t1.meta2.Structure.Kind.scalar;
+import static com.github.t1.meta2.Structure.Kind.sequence;
+import static com.github.t1.meta2.util.JavaCast.PRIMITIVE_WRAPPER_SCALARS;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.BDDAssertions.assertThat;
-import static org.assertj.core.api.BDDAssertions.*;
-import static org.junit.Assume.*;
-
-import java.util.*;
-import java.util.stream.IntStream;
-
-import org.assertj.core.groups.Tuple;
-import org.junit.*;
-
-import com.github.t1.meta2.*;
-import com.github.t1.meta2.Structure.Property;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.Assume.assumeTrue;
 
 public abstract class AbstractMappingTest<B> {
     public static final String STRING_VALUE = "stringValue";
@@ -75,36 +80,98 @@ public abstract class AbstractMappingTest<B> {
                         tuple("nestedMappingSequenceProperty", sequence),
 
                         tuple("nestedProperty", Structure.Kind.mapping),
-                        tuple("nestingProperty", Structure.Kind.mapping));
+                        tuple("nestingProperty", Structure.Kind.mapping),
+                        tuple("outerNestingProperty", Structure.Kind.mapping));
     }
 
     @Test
     public void shouldGetNestedProperties() {
         assumeTrue(hasSchema());
 
-        List<Property<B>> properties = mapping.getMapping("nestedProperty").getProperties();
+        List<Property<B>> nestedProperties = mapping.getMapping("nestedProperty").getProperties();
 
-        then(properties)
-                .isNotNull()
+        then(nestedProperties)
                 .extracting(this::nameAndKind)
-                .containsExactly(tuple("nestedStringProperty", scalar));
+                .containsExactly(
+                        tuple("nestedStringProperty", scalar),
+                        tuple("nestedIntegerProperty", scalar),
+                        tuple("nestedSequenceProperty", sequence));
+    }
+
+    @Test
+    public void shouldGetNestingProperties() {
+        assumeTrue(hasSchema());
+
+        List<Property<B>> nestingProperties = mapping.getMapping("nestingProperty").getProperties();
+
+        then(nestingProperties)
+                .extracting(this::nameAndKind)
+                .containsExactly(
+                        tuple("nested0", Structure.Kind.mapping),
+                        tuple("nested1", Structure.Kind.mapping));
+
+        List<Property<B>> nested0 = mapping.getMapping("nestingProperty").getMapping("nested0").getProperties();
+
+        then(nested0)
+                .extracting(this::nameAndKind)
+                .containsExactly(
+                        tuple("nestedStringProperty", scalar),
+                        tuple("nestedIntegerProperty", scalar),
+                        tuple("nestedSequenceProperty", sequence));
+    }
+
+    @Test
+    public void shouldGetOuterNestingProperties() {
+        assumeTrue(hasSchema());
+
+        List<Property<B>> outerNestingProperties = mapping.getMapping("outerNestingProperty").getProperties();
+
+        then(outerNestingProperties)
+                .extracting(this::nameAndKind)
+                .containsExactly(
+                        tuple("nestingPojo", Structure.Kind.mapping),
+                        tuple("nestingPojoList", sequence),
+                        tuple("nestedPojoArray", sequence));
+
+        List<Property<B>> nested0 =
+                mapping.getMapping("outerNestingProperty").getMapping("nestingPojo").getProperties();
+
+        then(nested0)
+                .extracting(this::nameAndKind)
+                .containsExactly(
+                        tuple("nested0", Structure.Kind.mapping),
+                        tuple("nested1", Structure.Kind.mapping));
+    }
+
+    @Test
+    public void shouldGetRootPath() {
+        assertThat(mapping.getPath()).hasToString("/");
+    }
+
+    @Test
+    public void shouldGetNestedPropertyPath() {
+        assertThat(mapping.getMapping("nestedProperty").getPath()).hasToString("/nestedProperty");
+    }
+
+    @Test
+    public void shouldGetNestingPropertyPath() {
+        assertThat(mapping.getMapping("nestingProperty").getMapping("nested0").getPath())
+                .hasToString("/nestingProperty/nested0");
+    }
+
+    @Test
+    public void shouldGetOuterNestingPropertyPath() {
+        assertThat(mapping.getMapping("outerNestingProperty").getMapping("nestingPojo").getMapping("nested1").getPath())
+                .hasToString("/outerNestingProperty/nestingPojo/nested1");
     }
 
     @Test
     @Ignore
-    public void shouldGetDoublyNestedProperties() {
-        assumeTrue(hasSchema());
-
-        List<Property<B>> properties = mapping.getMapping("nestingProperty").getProperties();
-
-        then(properties).extracting(this::nameAndKind)
-                .containsExactly(tuple("nestedProperty", Structure.Kind.mapping));
-
-        Structure.Path<B> path = mapping.getPath("nestingProperty/nestedProperty");
-        List<Property<B>> nestedProperties = path.getMapping().getProperties();
-
-        then(nestedProperties).extracting(this::nameAndKind)
-                .containsExactly(tuple("nestedStringProperty", scalar));
+    public void shouldGetOuterNestingListPropertyPath() {
+        Mapping<B> m =
+                this.mapping.getMapping("outerNestingProperty").getMapping("nestingPojoList").getMapping("nested1");
+        assertThat(m.getScalar("nestedStringProperty").get(object, String.class)).contains("x");
+        assertThat(m.getPath()).hasToString("/outerNestingProperty/nestingPojoList/nested1");
     }
 
     private Tuple nameAndKind(Property<?> property) {
@@ -119,6 +186,13 @@ public abstract class AbstractMappingTest<B> {
         then(property.getName()).isEqualTo(name);
 
         return property;
+    }
+
+    @Test
+    public void shouldGetUndefinedScalarAsEmpty() {
+        Scalar<B> scalar = mapping.getScalar("undefined");
+
+        then(scalar.get(object, String.class)).isEmpty();
     }
 
     @Test
@@ -267,11 +341,25 @@ public abstract class AbstractMappingTest<B> {
         assertSequence(property, STRING_LIST_VALUE, String.class);
     }
 
-    private <T> void assertSequence(Sequence<B> property, List<T> expectedValues, Class<T> type) {
+    private <T> void assertSequence(Sequence<B> sequence, List<T> expectedValues, Class<T> elementType) {
         int expectedSize = expectedValues.size();
-        // TODO then(property.size(object)).isEqualTo(expectedSize);
         for (int i = 0; i < expectedSize; i++)
-            then(property.getScalar(i).get(object, type)).contains(expectedValues.get(i));
+            then(sequence.getScalar(i).get(object, elementType)).contains(expectedValues.get(i));
+        then(sequence.get(object, elementType)).isEqualTo(expectedValues);
+    }
+
+    @Test
+    public void shouldGetNestedScalar() {
+        Scalar<B> scalar = mapping.getMapping("nestedProperty").getScalar("nestedStringProperty");
+
+        assertScalar(scalar, "nestedString");
+    }
+
+    @Test
+    public void shouldGetNestedSequence() {
+        Sequence<B> sequence = mapping.getMapping("nestedProperty").getSequence("nestedSequenceProperty");
+
+        assertSequence(sequence, STRING_LIST_VALUE, String.class);
     }
 
     @Test
@@ -298,12 +386,11 @@ public abstract class AbstractMappingTest<B> {
         assertThat(sequence1.getScalar(OUT_OF_INDEX).get(object, String.class)).isEmpty();
     }
 
-
     @Test
-    public void shouldGetNestedProperty() {
-        // TODO Property<B> property = getProperty("nestedProperty").get("nestedStringProperty");
+    public void shouldGetUndefinedNestedScalarAsEmpty() {
+        Scalar<B> scalar = mapping.getMapping("nestedProperty").getScalar("undefined");
 
-        // TODO assertScalar(property, "nestedString");
+        then(scalar.get(object, String.class)).isEmpty();
     }
 
     @Test
