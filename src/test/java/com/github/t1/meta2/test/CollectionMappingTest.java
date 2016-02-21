@@ -1,7 +1,7 @@
 package com.github.t1.meta2.test;
 
-import com.github.t1.meta2.CollectionMeta;
 import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.MetaCollection;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedHashMap;
@@ -52,6 +52,6 @@ public class CollectionMappingTest extends AbstractMappingTest<Map<String, ?>> {
 
     @Override
     protected Mapping<Map<String, ?>> createMapping() {
-        return CollectionMeta.mapping();
+        return MetaCollection.mapping();
     }
 }

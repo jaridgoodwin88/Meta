@@ -1,7 +1,7 @@
 package com.github.t1.meta2.test;
 
-import com.github.t1.meta2.JsonMeta;
 import com.github.t1.meta2.Mapping;
+import com.github.t1.meta2.MetaJson;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -52,7 +52,7 @@ public class JsonMappingTest extends AbstractMappingTest<JsonObject> {
 
     @Override
     protected Mapping<JsonObject> createMapping() {
-        return JsonMeta.mapping();
+        return MetaJson.mapping();
     }
 
     @Override

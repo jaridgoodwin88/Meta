@@ -13,7 +13,7 @@ import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
-public class JsonMeta {
+public class MetaJson {
     public static Mapping<JsonObject> mapping() {
         return new JsonMapping<>(Structure.Path.ROOT, identity());
     }

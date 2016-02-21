@@ -17,7 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
-public class ReflectionMeta {
+public class MetaReflection {
     public static <T> Mapping<T> mapping(Class<T> type) {
         return new ReflectionMapping<>(type, Structure.Path.ROOT, identity());
     }

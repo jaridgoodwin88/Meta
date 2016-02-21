@@ -12,7 +12,7 @@ import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
-public class CollectionMeta {
+public class MetaCollection {
     public static Mapping<Map<String, ?>> mapping() {
         return new CollectionMapping<>(Structure.Path.ROOT, identity());
     }

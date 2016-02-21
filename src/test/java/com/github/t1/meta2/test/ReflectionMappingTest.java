@@ -1,7 +1,7 @@
 package com.github.t1.meta2.test;
 
 import com.github.t1.meta2.Mapping;
-import com.github.t1.meta2.ReflectionMeta;
+import com.github.t1.meta2.MetaReflection;
 import lombok.RequiredArgsConstructor;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class ReflectionMappingTest extends AbstractMappingTest<com.github.t1.met
 
     @Override
     protected Mapping<Pojo> createMapping() {
-        return ReflectionMeta.mapping(Pojo.class);
+        return MetaReflection.mapping(Pojo.class);
     }
 
     // TODO pull this up
