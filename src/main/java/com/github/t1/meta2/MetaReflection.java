@@ -104,7 +104,7 @@ public class MetaReflection {
             return properties;
         }
 
-        private final class ReflectionProperty implements Structure.Property<B> {
+        private final class ReflectionProperty extends Structure.Property<B> {
             private final Field field;
 
             private ReflectionProperty(Field field) {
@@ -134,17 +134,6 @@ public class MetaReflection {
                 return PRIMITIVE_WRAPPER_SCALARS.contains(field.getType())
                         || PRIMITIVE_SCALARS.contains(field.getType())
                         || CharSequence.class.isAssignableFrom(field.getType());
-            }
-
-            @Override
-            public String toString() {
-                return getKind() + " " + getKey();
-            }
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public Mapping<B> getMapping() {
-                return mapping((Class<B>) field.getType());
             }
         }
     }

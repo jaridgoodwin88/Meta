@@ -41,11 +41,11 @@ public abstract class AbstractMappingTest<B> {
     public static final List<String> STRING_LIST_VALUE = asList("one", "two", "three");
     private static final int OUT_OF_INDEX = 99;
 
-    B object = createObject();
+    final B object = createObject();
 
     protected abstract B createObject();
 
-    Mapping<B> mapping = createMapping();
+    final Mapping<B> mapping = createMapping();
 
     protected abstract Mapping<B> createMapping();
 

@@ -6,7 +6,6 @@ import lombok.Value;
 
 import java.nio.file.InvalidPathException;
 
-import static com.github.t1.meta2.Structure.Kind.*;
 import static java.util.Arrays.asList;
 
 /**
@@ -20,48 +19,33 @@ public class Structure {
     }
 
     /** One in a {@link Sequence} of objects */
-    public interface Element<B> extends Item<B, Integer> {
-        default int getIndex() {
+    public abstract static class Element<B> extends Item<B, Integer> {
+        public int getIndex() {
             return getKey();
         }
     }
 
     /** The key-value pair in a {@link Mapping}. */
-    public interface Property<B> extends Item<B, String> {
-        default String getName() {
+    public abstract static class Property<B> extends Item<B, String> {
+        public String getName() {
             return getKey();
         }
     }
 
     /** Either a {@link Property} or an {@link Element} */
-    // TODO remove Item... it's useless, as properties can be derived from the structure, but elements require an instance
-    interface Item<B, K> {
-        Structure.Kind getKind();
+    abstract static class Item<B, K> {
+        public abstract Structure.Kind getKind();
 
-        K getKey();
+        public abstract K getKey();
 
-        default void checkKind(Structure.Kind expected) {
+        public void checkKind(Structure.Kind expected) {
             if (getKind() != expected)
                 throw new IllegalStateException(this + " is a " + getKind() + ", not a " + expected);
         }
 
-        default Scalar<B> getScalar() {
-            checkKind(scalar);
-            throw notOverloaded();
-        }
-
-        default Sequence<B> getSequence() {
-            checkKind(sequence);
-            throw notOverloaded();
-        }
-
-        default Mapping<B> getMapping() {
-            checkKind(mapping);
-            throw notOverloaded();
-        }
-
-        default UnsupportedOperationException notOverloaded() {
-            return new UnsupportedOperationException("not overloaded");
+        @Override
+        public String toString() {
+            return getKind() + " " + getKey();
         }
     }
 
