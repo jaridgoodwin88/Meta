@@ -3,12 +3,13 @@ package com.github.t1.meta2;
 import com.github.t1.meta2.util.JavaCast;
 import com.github.t1.meta2.util.OptionalExtension;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.util.Collections.emptyList;
+import static com.github.t1.meta2.util.OptionalExtension.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
@@ -32,10 +33,9 @@ public class MetaCollection {
         @Override
         @SuppressWarnings("unchecked")
         public <T> List<T> get(B object, Class<T> elementType) {
-            Optional<?> backtracked = backtrack.apply(Optional.of(object));
-            if (!backtracked.isPresent())
-                return emptyList();
-            return OptionalExtension.toList(backtracked.get()).stream()
+            return stream(backtrack.apply(Optional.of(object)))
+                    .map(OptionalExtension::toList)
+                    .flatMap(Collection::stream)
                     .map(element -> JavaCast.cast(element, elementType))
                     .collect(toList());
         }

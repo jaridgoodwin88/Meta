@@ -366,7 +366,7 @@ public abstract class AbstractMappingTest<B> {
     public void shouldGetNestedSequenceSequence() {
         Sequence<B> list = mapping.getSequence("nestedSequenceSequenceProperty");
 
-        // TODO assertThat(list.size(object)).isEqualTo(2);
+        assertThat(list.size(object)).isEqualTo(2);
         // TODO assertThat(list.getSequence(object, 0).size(object)).isEqualTo(2);
 
         // TODO if (hasSchema())
