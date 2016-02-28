@@ -1,19 +1,15 @@
 package com.github.t1.meta2;
 
-import com.github.t1.meta2.util.JsonCast;
-import com.github.t1.meta2.util.OptionalExtension;
+import static com.github.t1.meta2.util.OptionalExtension.*;
+import static java.util.function.Function.*;
+import static java.util.stream.Collectors.toList;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
-import static com.github.t1.meta2.util.OptionalExtension.stream;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
+import javax.json.*;
+
+import com.github.t1.meta2.util.*;
 
 public class MetaJson {
     public static Mapping<JsonObject> mapping() {
@@ -40,6 +36,7 @@ public class MetaJson {
             return stream(backtrack.apply(Optional.of(object)))
                     .map(OptionalExtension::toList)
                     .flatMap(Collection::stream)
+                    .flatMap(o -> ((Collection<T>) o).stream())
                     .map(element -> JsonCast.cast(element, elementType))
                     .collect(toList());
         }

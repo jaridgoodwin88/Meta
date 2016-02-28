@@ -36,6 +36,8 @@ public class JsonCast {
             return (float) ((JsonNumber) value).doubleValue();
         if (Double.class.isAssignableFrom(targetType))
             return ((JsonNumber) value).doubleValue();
-        throw new ClassCastException("Cannot cast " + value + " to " + targetType.getName());
+        if (Object.class.equals(targetType))
+            return value.toString();
+        throw new ClassCastException("Cannot cast " + value.getClass() + ": " + value + " to " + targetType.getName());
     }
 }
