@@ -12,15 +12,24 @@ public abstract class Visitor {
         enterProperty((key == null) ? null : key.toString());
     }
 
-    public void enterProperty(String key) {}
+    public void enterMapping() { }
 
-    public void leaveProperty() {}
+    public void continueMapping() { }
 
-
-    public void enterSequence() {}
-
-    public void leaveSequence() {}
+    public void leaveMapping() { }
 
 
-    public void visitScalar(Object value) {}
+    public void enterProperty(String key) { }
+
+    public void leaveProperty() { }
+
+
+    public void enterSequence() { }
+
+    public void continueSequence() { }
+
+    public void leaveSequence() { }
+
+
+    public void visitScalar(Object value) { }
 }

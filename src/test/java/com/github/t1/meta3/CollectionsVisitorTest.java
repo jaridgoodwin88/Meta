@@ -15,4 +15,8 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
     @Override protected Object createFlatSequence() {
         return ImmutableList.of("a", "b", "c");
     }
+
+    @Override protected Object createNestedSequence() {
+        return ImmutableList.of(ImmutableList.of("a1", "a2", "a3"), ImmutableList.of(), ImmutableList.of("c1"));
+    }
 }

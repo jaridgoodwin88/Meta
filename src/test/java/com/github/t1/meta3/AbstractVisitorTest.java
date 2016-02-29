@@ -1,49 +1,65 @@
 package com.github.t1.meta3;
 
-import com.github.t1.meta3.visitor.Guide;
 import com.github.t1.meta3.visitor.Visitor;
 import com.github.t1.meta3.visitor.VisitorDecorator;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractVisitorTest {
     Meta meta = new Meta();
 
-    @Mock
-    Visitor visitor;
+    Visitor visitor = new Visitor() {
+        private final StringBuilder out = new StringBuilder();
 
-    Guide guide;
+        @Override public void enterMapping() {
+            out.append("{");
+        }
 
-    InOrder inOrder;
+        @Override public void leaveMapping() {
+            out.append("}");
+        }
 
-    @Before
-    public void before() {
-        this.inOrder = inOrder(visitor);
-        when(visitor.getGuide()).thenCallRealMethod();
-        doCallRealMethod().when(visitor).setGuide(any(Guide.class));
-    }
+        @Override public void continueMapping() {
+            out.append("|");
+        }
 
-    @After
-    public void after() {
-        verify(visitor, atLeastOnce()).getGuide();
-        verify(visitor).setGuide(any());
-        verifyNoMoreInteractions(visitor);
-    }
+        @Override public void enterProperty(String key) {
+            out.append(key).append(":«");
+        }
 
-    private void startTour(Object object) {
-        guide = meta.getGuideTo(object);
-        guide.guide(visitor);
+        @Override public void leaveProperty() {
+            out.append("»");
+        }
+
+        @Override public void enterSequence() {
+            out.append("[");
+        }
+
+        @Override public void continueSequence() {
+            out.append(",");
+        }
+
+        @Override public void leaveSequence() {
+            out.append("]");
+        }
+
+        @Override public void visitScalar(Object value) {
+            out.append("<").append(value).append(">");
+        }
+
+        @Override public String toString() {
+            return out.toString();
+        }
+    };
+
+    private void tour(Object object) {
+        meta.getGuideTo(object).guide(visitor);
     }
 
     protected Visitor logging(Visitor visitor) {
@@ -59,26 +75,18 @@ public abstract class AbstractVisitorTest {
 
     @Test
     public void shouldVisitStringScalar() {
-        startTour("hello world");
+        tour("hello world");
 
-        inOrder.verify(visitor).setGuide(guide);
-
-        inOrder.verify(visitor).visitScalar("hello world");
+        assertThat(visitor).hasToString("<hello world>");
     }
 
     @Test
     public void shouldVisitFlatMapping() {
         Object object = createFlatMapping();
 
-        startTour(object);
+        tour(object);
 
-        inOrder.verify(visitor).enterProperty((Object) "one");
-        inOrder.verify(visitor).visitScalar("a");
-        inOrder.verify(visitor).leaveProperty();
-
-        inOrder.verify(visitor).enterProperty((Object) "two");
-        inOrder.verify(visitor).visitScalar("b");
-        inOrder.verify(visitor).leaveProperty();
+        assertThat(visitor).hasToString("{one:«<a>»|two:«<b>»}");
     }
 
     protected abstract Object createFlatMapping();
@@ -87,17 +95,9 @@ public abstract class AbstractVisitorTest {
     public void shouldVisitNestedMapping() {
         Object object = createNestedMapping();
 
-        startTour(object);
+        tour(object);
 
-        inOrder.verify(visitor).enterProperty((Object) "mappingOne");
-
-        inOrder.verify(visitor).enterProperty((Object) "one");
-        inOrder.verify(visitor).visitScalar("a");
-        inOrder.verify(visitor).leaveProperty();
-
-        inOrder.verify(visitor).enterProperty((Object) "two");
-        inOrder.verify(visitor).visitScalar("b");
-        inOrder.verify(visitor, times(2)).leaveProperty();
+        assertThat(visitor).hasToString("{mappingOne:«{one:«<a>»|two:«<b>»}»}");
     }
 
     protected abstract Object createNestedMapping();
@@ -106,16 +106,21 @@ public abstract class AbstractVisitorTest {
     public void shouldVisitFlatSequence() {
         Object object = createFlatSequence();
 
-        startTour(object);
+        tour(object);
 
-        inOrder.verify(visitor).setGuide(guide);
-
-        inOrder.verify(visitor).enterSequence();
-        inOrder.verify(visitor).visitScalar("a");
-        inOrder.verify(visitor).visitScalar("b");
-        inOrder.verify(visitor).visitScalar("c");
-        inOrder.verify(visitor).leaveSequence();
+        assertThat(visitor).hasToString("[<a>,<b>,<c>]");
     }
 
     protected abstract Object createFlatSequence();
+
+    @Test
+    public void shouldVisitNestedSequence() {
+        Object object = createNestedSequence();
+
+        tour(object);
+
+        assertThat(visitor).hasToString("[[<a1>,<a2>,<a3>],[],[<c1>]]");
+    }
+
+    protected abstract Object createNestedSequence();
 }

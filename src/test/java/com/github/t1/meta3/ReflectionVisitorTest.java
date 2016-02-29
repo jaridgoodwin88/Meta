@@ -24,4 +24,8 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Override protected Object createFlatSequence() {
         return new String[] { "a", "b", "c" };
     }
+
+    @Override protected Object createNestedSequence() {
+        return new String[][] { { "a1", "a2", "a3" }, {}, { "c1" } };
+    }
 }

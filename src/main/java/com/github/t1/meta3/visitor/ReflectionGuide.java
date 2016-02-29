@@ -5,7 +5,7 @@ import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.List;
 
 @RequiredArgsConstructor
 class ReflectionGuide extends Guide {
@@ -14,8 +14,20 @@ class ReflectionGuide extends Guide {
 
     @Override
     public void guide(Visitor visitor) {
+        List<Field> fields = getFields();
+        if (fields.isEmpty())
+            return;
         super.guide(visitor);
-        getFields().forEach(field -> guideToProperty(visitor, field));
+        visitor.enterMapping();
+        boolean first = true;
+        for (Field field : fields) {
+            if (first)
+                first = false;
+            else
+                visitor.continueMapping();
+            guideToProperty(visitor, field);
+        }
+        visitor.leaveMapping();
     }
 
     private void guideToProperty(Visitor visitor, Field field) {
@@ -30,7 +42,7 @@ class ReflectionGuide extends Guide {
         return field.get(object);
     }
 
-    private Stream<Field> getFields() {
-        return Arrays.asList(object.getClass().getDeclaredFields()).stream();
+    private List<Field> getFields() {
+        return Arrays.asList(object.getClass().getDeclaredFields());
     }
 }

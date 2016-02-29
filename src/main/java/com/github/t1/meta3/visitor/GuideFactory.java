@@ -10,9 +10,9 @@ public class GuideFactory {
         if (object instanceof Map)
             return new MapGuide(this, (Map<?, ?>) object);
         if (object instanceof Collection)
-            return new CollectionGuide((Collection<?>) object);
+            return new CollectionGuide(this, (Collection<?>) object);
         if (object.getClass().isArray())
-            return new ArrayGuide(object);
+            return new ArrayGuide(this, object);
         if (object instanceof String)
             return new ScalarGuide(object);
         return new ReflectionGuide(this, object);

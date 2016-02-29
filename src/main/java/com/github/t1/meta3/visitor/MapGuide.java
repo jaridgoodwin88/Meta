@@ -11,8 +11,19 @@ class MapGuide extends Guide {
 
     @Override
     public void guide(Visitor visitor) {
+        if (map.isEmpty())
+            return;
         super.guide(visitor);
-        map.entrySet().forEach(entry -> guideToProperty(visitor, entry));
+        visitor.enterMapping();
+        boolean first = true;
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (first)
+                first = false;
+            else
+                visitor.continueMapping();
+            guideToProperty(visitor, entry);
+        }
+        visitor.leaveMapping();
     }
 
     private void guideToProperty(Visitor visitor, Map.Entry<?, ?> entry) {
