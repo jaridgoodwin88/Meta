@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class CollectionMeta extends Meta {
+class MapGuide extends Guide {
     private final Map<?, ?> map;
 
     @Override
     public void guide(Visitor visitor) {
+        super.guide(visitor);
         map.entrySet().forEach(entry -> guideToProperty(visitor, entry));
     }
 

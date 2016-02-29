@@ -8,11 +8,12 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class ReflectionMeta extends Meta {
+class ReflectionGuide extends Guide {
     private final Object object;
 
     @Override
     public void guide(Visitor visitor) {
+        super.guide(visitor);
         getFields().forEach(field -> guideToProperty(visitor, field));
     }
 

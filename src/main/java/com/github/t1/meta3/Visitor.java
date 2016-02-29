@@ -4,16 +4,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class Visitor {
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Guide guide;
 
     public void enterProperty(Object key) {
         enterProperty((key == null) ? null : key.toString());
     }
 
-    public abstract void enterProperty(String key);
+    public void enterProperty(String key) {}
 
-    public abstract void leaveProperty();
+    public void leaveProperty() {}
 
-    public abstract void visitScalar(Object value);
+
+    public void enterSequence() {}
+
+    public void leaveSequence() {}
+
+
+    public void visitScalar(Object value) {}
 }

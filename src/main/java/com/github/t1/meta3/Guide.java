@@ -1,4 +1,7 @@
 package com.github.t1.meta3;
 
-public class Guide {
+public abstract class Guide {
+    public void guide(Visitor visitor) {
+        visitor.setGuide(this);
+    }
 }

@@ -1,13 +1,16 @@
 package com.github.t1.meta3;
 
+import java.util.Collection;
 import java.util.Map;
 
 public abstract class Meta {
-    public static Meta of(Object object) {
+    @SuppressWarnings("ChainOfInstanceofChecks") public static Guide createGuideTo(Object object) {
         if (object instanceof Map)
-            return new CollectionMeta((Map<?, ?>) object);
-        return new ReflectionMeta(object);
+            return new MapGuide((Map<?, ?>) object);
+        if (object instanceof Collection)
+            return new CollectionGuide((Collection<?>) object);
+        if (object.getClass().isArray())
+            return new ArrayGuide(object);
+        return new ReflectionGuide(object);
     }
-
-    public abstract void guide(Visitor visitor);
 }
