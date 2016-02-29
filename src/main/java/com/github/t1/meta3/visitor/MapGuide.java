@@ -6,6 +6,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 class MapGuide extends Guide {
+    private final GuideFactory guideFactory;
     private final Map<?, ?> map;
 
     @Override
@@ -16,7 +17,7 @@ class MapGuide extends Guide {
 
     private void guideToProperty(Visitor visitor, Map.Entry<?, ?> entry) {
         visitor.enterProperty(entry.getKey());
-        visitor.visitScalar(entry.getValue());
+        guideFactory.guideTo(entry.getValue()).guide(visitor);
         visitor.leaveProperty();
     }
 }

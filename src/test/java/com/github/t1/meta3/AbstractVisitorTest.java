@@ -5,14 +5,15 @@ import com.github.t1.meta3.visitor.Visitor;
 import com.github.t1.meta3.visitor.VisitorDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
@@ -24,13 +25,24 @@ public abstract class AbstractVisitorTest {
 
     Guide guide;
 
+    InOrder inOrder;
+
+    @Before
+    public void before() {
+        this.inOrder = inOrder(visitor);
+        when(visitor.getGuide()).thenCallRealMethod();
+        doCallRealMethod().when(visitor).setGuide(any(Guide.class));
+    }
+
     @After
     public void after() {
+        verify(visitor, atLeastOnce()).getGuide();
+        verify(visitor).setGuide(any());
         verifyNoMoreInteractions(visitor);
     }
 
     private void startTour(Object object) {
-        guide = meta.createGuideTo(object);
+        guide = meta.getGuideTo(object);
         guide.guide(visitor);
     }
 
@@ -46,14 +58,19 @@ public abstract class AbstractVisitorTest {
     }
 
     @Test
+    public void shouldVisitStringScalar() {
+        startTour("hello world");
+
+        inOrder.verify(visitor).setGuide(guide);
+
+        inOrder.verify(visitor).visitScalar("hello world");
+    }
+
+    @Test
     public void shouldVisitFlatMapping() {
         Object object = createFlatMapping();
 
         startTour(object);
-
-        InOrder inOrder = inOrder(visitor);
-
-        inOrder.verify(visitor).setGuide(guide);
 
         inOrder.verify(visitor).enterProperty((Object) "one");
         inOrder.verify(visitor).visitScalar("a");
@@ -67,12 +84,29 @@ public abstract class AbstractVisitorTest {
     protected abstract Object createFlatMapping();
 
     @Test
+    public void shouldVisitNestedMapping() {
+        Object object = createNestedMapping();
+
+        startTour(object);
+
+        inOrder.verify(visitor).enterProperty((Object) "mappingOne");
+
+        inOrder.verify(visitor).enterProperty((Object) "one");
+        inOrder.verify(visitor).visitScalar("a");
+        inOrder.verify(visitor).leaveProperty();
+
+        inOrder.verify(visitor).enterProperty((Object) "two");
+        inOrder.verify(visitor).visitScalar("b");
+        inOrder.verify(visitor, times(2)).leaveProperty();
+    }
+
+    protected abstract Object createNestedMapping();
+
+    @Test
     public void shouldVisitFlatSequence() {
         Object object = createFlatSequence();
 
         startTour(object);
-
-        InOrder inOrder = inOrder(visitor);
 
         inOrder.verify(visitor).setGuide(guide);
 

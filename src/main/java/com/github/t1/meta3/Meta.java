@@ -6,7 +6,7 @@ import com.github.t1.meta3.visitor.GuideFactory;
 public class Meta {
     private final GuideFactory guideFactory = new GuideFactory();
 
-    public Guide createGuideTo(Object object) {
-        return guideFactory.createGuideTo(object);
+    public Guide getGuideTo(Object object) {
+        return guideFactory.guideTo(object);
     }
 }

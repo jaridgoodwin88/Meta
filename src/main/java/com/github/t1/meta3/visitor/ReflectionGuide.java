@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 class ReflectionGuide extends Guide {
+    private final GuideFactory guideFactory;
     private final Object object;
 
     @Override
@@ -19,7 +20,7 @@ class ReflectionGuide extends Guide {
 
     private void guideToProperty(Visitor visitor, Field field) {
         visitor.enterProperty((Object) field.getName());
-        visitor.visitScalar(value(field));
+        guideFactory.guideTo(value(field)).guide(visitor);
         visitor.leaveProperty();
     }
 
