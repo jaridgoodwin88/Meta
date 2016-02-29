@@ -1,5 +1,8 @@
 package com.github.t1.meta3;
 
+import com.github.t1.meta3.visitor.Guide;
+import com.github.t1.meta3.visitor.Visitor;
+import com.github.t1.meta3.visitor.VisitorDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Test;
@@ -14,6 +17,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractVisitorTest {
+    Meta meta = new Meta();
+
     @Mock
     Visitor visitor;
 
@@ -25,7 +30,7 @@ public abstract class AbstractVisitorTest {
     }
 
     private void startTour(Object object) {
-        guide = Meta.createGuideTo(object);
+        guide = meta.createGuideTo(object);
         guide.guide(visitor);
     }
 

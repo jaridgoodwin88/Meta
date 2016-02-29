@@ -1,4 +1,4 @@
-package com.github.t1.meta3;
+package com.github.t1.meta3.visitor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
