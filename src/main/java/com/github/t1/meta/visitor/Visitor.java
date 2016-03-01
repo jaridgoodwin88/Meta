@@ -8,28 +8,41 @@ public abstract class Visitor {
     @Setter
     protected Guide guide;
 
+    public void enterMapping() {}
+
+    public void continueMapping() {}
+
+    public void leaveMapping() {}
+
+
     public void enterProperty(Object key) {
         enterProperty((key == null) ? null : key.toString());
     }
 
-    public void enterMapping() { }
+    public void enterProperty(String key) {}
 
-    public void continueMapping() { }
-
-    public void leaveMapping() { }
+    public void leaveProperty() {}
 
 
-    public void enterProperty(String key) { }
+    public void enterSequence() {}
 
-    public void leaveProperty() { }
+    public void continueSequence() {}
 
-
-    public void enterSequence() { }
-
-    public void continueSequence() { }
-
-    public void leaveSequence() { }
+    public void leaveSequence() {}
 
 
-    public void visitScalar(Object value) { }
+    @SuppressWarnings("ChainOfInstanceofChecks") public void visitScalar(Object value) {
+        if (value instanceof Boolean)
+            visitBoolean((Boolean) value);
+        else if (value instanceof Number)
+            visitNumber((Number) value);
+        else
+            visitOtherScalar(value);
+    }
+
+    public void visitBoolean(Boolean value) {}
+
+    public void visitNumber(Number value) {}
+
+    public void visitOtherScalar(Object value) {}
 }

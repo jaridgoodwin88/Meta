@@ -26,7 +26,8 @@ class ReflectionGuide extends MappingGuide {
 
     private boolean isProperty(Field field) {
         return !Modifier.isStatic(field.getModifiers())
-                && !Modifier.isVolatile(field.getModifiers());
+                && !Modifier.isVolatile(field.getModifiers())
+                && !field.isSynthetic();
     }
 
     @Value

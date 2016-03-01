@@ -10,7 +10,8 @@ import static java.util.Collections.emptyList;
 
 public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Data
-    public static class PojoContainer implements Serializable {
+    public class PojoContainer implements Serializable {
+        // ignore non-static 'this'
         private static final long serialVersionUID = -1L; // must be ignored
 
         private Pojo mappingOne = new Pojo();
