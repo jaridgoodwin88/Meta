@@ -1,32 +1,33 @@
 package com.github.t1.meta.visitor;
 
-import lombok.RequiredArgsConstructor;
+import com.github.t1.meta.Property;
+import lombok.Value;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
-@RequiredArgsConstructor
-class MapGuide extends Guide {
-    private final GuideFactory guideFactory;
+class MapGuide extends MappingGuide {
     private final Map<?, ?> map;
 
-    @Override
-    public void guide(Visitor visitor) {
-        super.guide(visitor);
-        visitor.enterMapping();
-        boolean first = true;
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            Object value = entry.getValue();
-            if (value == null)
-                continue;
-            if (first)
-                first = false;
-            else
-                visitor.continueMapping();
-            visitor.enterProperty(entry.getKey());
-            guideFactory.guideTo(value).guide(visitor);
-            visitor.leaveProperty();
-        }
-        visitor.leaveMapping();
+    MapGuide(GuideFactory guideFactory, Map<?, ?> map) {
+        super(guideFactory);
+        this.map = map;
     }
 
+    @Override protected Stream<Property> getProperties() {
+        return map.entrySet().stream().map(MapProperty::new);
+    }
+
+    @Value
+    private class MapProperty implements Property {
+        private final Map.Entry<?, ?> entry;
+
+        @Override public Object getName() {
+            return entry.getKey();
+        }
+
+        @Override public Object getValue() {
+            return entry.getValue();
+        }
+    }
 }
