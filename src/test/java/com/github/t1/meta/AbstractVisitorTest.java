@@ -6,11 +6,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractVisitorTest {
+    private static final int SOME_INT = 123;
+    private static final double SOME_FLOAT = 123.4;
+    private static final double SOME_DOUBLE = 123.45d;
+
     Meta meta = new Meta();
 
     Visitor visitor = new Visitor() {
@@ -66,6 +74,94 @@ public abstract class AbstractVisitorTest {
         tour("hello world");
 
         assertThat(visitor).hasToString("<hello world>");
+    }
+
+    @Test
+    public void shouldVisitBooleanScalar() {
+        tour(true);
+
+        assertThat(visitor).hasToString("<true>");
+    }
+
+    @Test
+    public void shouldVisitByteScalar() {
+        tour((byte) SOME_INT);
+
+        assertThat(visitor).hasToString("<123>");
+    }
+
+    @Test
+    public void shouldVisitCharacterScalar() {
+        tour('c');
+
+        assertThat(visitor).hasToString("<c>");
+    }
+
+    @Test
+    public void shouldVisitShortScalar() {
+        tour((short) SOME_INT);
+
+        assertThat(visitor).hasToString("<123>");
+    }
+
+    @Test
+    public void shouldVisitIntegerScalar() {
+        tour(SOME_INT);
+
+        assertThat(visitor).hasToString("<123>");
+    }
+
+    @Test
+    public void shouldVisitLongScalar() {
+        tour((long) SOME_INT);
+
+        assertThat(visitor).hasToString("<123>");
+    }
+
+    @Test
+    public void shouldVisitFloatScalar() {
+        tour(SOME_FLOAT);
+
+        assertThat(visitor).hasToString("<123.4>");
+    }
+
+    @Test
+    public void shouldVisitDoubleScalar() {
+        tour(SOME_DOUBLE);
+
+        assertThat(visitor).hasToString("<123.45>");
+    }
+
+    @Test
+    public void shouldVisitBigIntegerScalar() {
+        tour(BigInteger.TEN);
+
+        assertThat(visitor).hasToString("<10>");
+    }
+
+    @Test
+    public void shouldVisitBigDecimalScalar() {
+        tour(new BigDecimal("123.45"));
+
+        assertThat(visitor).hasToString("<123.45>");
+    }
+
+    enum E {ONE, TWO, THREE}
+
+    @Test
+    public void shouldVisitEnumScalar() {
+        tour(E.TWO);
+
+        assertThat(visitor).hasToString("<TWO>");
+    }
+
+    @Test
+    public void shouldVisitLocalDateScalar() {
+        LocalDate now = LocalDate.now();
+
+        tour(now);
+
+        assertThat(visitor).hasToString("<" + now + ">");
     }
 
     @Test

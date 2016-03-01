@@ -13,10 +13,9 @@ public abstract class SequenceGuide extends Guide {
         visitor.enterSequence();
         Continue continueMapping = new Continue(visitor::continueSequence);
         getItems().forEach(item -> {
-                    continueMapping.call();
-                    guideFactory.guideTo(item).guide(visitor);
-                }
-        );
+            continueMapping.call();
+            guideFactory.guideTo(item).guide(visitor);
+        });
         visitor.leaveSequence();
     }
 

@@ -5,8 +5,8 @@ import lombok.SneakyThrows;
 import lombok.Value;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 class ReflectionGuide extends MappingGuide {
@@ -18,11 +18,15 @@ class ReflectionGuide extends MappingGuide {
     }
 
     @Override protected Stream<Property> getProperties() {
-        return getFields(object).stream().map(ReflectionProperty::new);
+        return Arrays.asList(object.getClass().getDeclaredFields())
+                .stream()
+                .filter(this::isProperty)
+                .map(ReflectionProperty::new);
     }
 
-    private List<Field> getFields(Object object) {
-        return Arrays.asList(object.getClass().getDeclaredFields());
+    private boolean isProperty(Field field) {
+        return !Modifier.isStatic(field.getModifiers())
+                && !Modifier.isVolatile(field.getModifiers());
     }
 
     @Value
