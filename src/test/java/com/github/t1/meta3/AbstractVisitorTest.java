@@ -58,7 +58,7 @@ public abstract class AbstractVisitorTest {
         }
     };
 
-    private void tour(Object object) {
+    void tour(Object object) {
         meta.getGuideTo(object).guide(visitor);
     }
 
@@ -123,4 +123,26 @@ public abstract class AbstractVisitorTest {
     }
 
     protected abstract Object createNestedSequence();
+
+    @Test
+    public void shouldVisitMappingWithSequence() {
+        Object object = createMappingWithSequence();
+
+        tour(object);
+
+        assertThat(visitor).hasToString("{a:«[<x>,<y>,<z>]»|b:«[]»|c:«[<x>]»}");
+    }
+
+    protected abstract Object createMappingWithSequence();
+
+    @Test
+    public void shouldVisitSequenceWithMapping() {
+        Object object = createSequenceWithMapping();
+
+        tour(object);
+
+        assertThat(visitor).hasToString("[{one:«<a>»|two:«<b>»},{},{two:«<b>»}]");
+    }
+
+    protected abstract Object createSequenceWithMapping();
 }

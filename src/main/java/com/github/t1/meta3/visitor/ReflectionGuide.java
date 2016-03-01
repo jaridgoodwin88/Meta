@@ -14,35 +14,32 @@ class ReflectionGuide extends Guide {
 
     @Override
     public void guide(Visitor visitor) {
-        List<Field> fields = getFields();
-        if (fields.isEmpty())
-            return;
+        List<Field> fields = getFields(object);
         super.guide(visitor);
         visitor.enterMapping();
         boolean first = true;
         for (Field field : fields) {
+            Object value = value(object, field);
+            if (value == null)
+                continue;
             if (first)
                 first = false;
             else
                 visitor.continueMapping();
-            guideToProperty(visitor, field);
+            visitor.enterProperty((Object) field.getName());
+            guideFactory.guideTo(value).guide(visitor);
+            visitor.leaveProperty();
         }
         visitor.leaveMapping();
     }
 
-    private void guideToProperty(Visitor visitor, Field field) {
-        visitor.enterProperty((Object) field.getName());
-        guideFactory.guideTo(value(field)).guide(visitor);
-        visitor.leaveProperty();
+    private List<Field> getFields(Object object) {
+        return Arrays.asList(object.getClass().getDeclaredFields());
     }
 
     @SneakyThrows(IllegalAccessException.class)
-    private Object value(Field field) {
+    private Object value(Object object, Field field) {
         field.setAccessible(true);
         return field.get(object);
-    }
-
-    private List<Field> getFields() {
-        return Arrays.asList(object.getClass().getDeclaredFields());
     }
 }
