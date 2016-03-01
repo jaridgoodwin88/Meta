@@ -1,7 +1,6 @@
 package com.github.t1.meta3;
 
 import com.github.t1.meta3.visitor.Visitor;
-import com.github.t1.meta3.visitor.VisitorDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,20 +20,20 @@ public abstract class AbstractVisitorTest {
             out.append("{");
         }
 
-        @Override public void leaveMapping() {
-            out.append("}");
-        }
-
         @Override public void continueMapping() {
             out.append("|");
         }
 
+        @Override public void leaveMapping() {
+            out.append("}");
+        }
+
         @Override public void enterProperty(String key) {
-            out.append(key).append(":«");
+            out.append(key).append(":");
         }
 
         @Override public void leaveProperty() {
-            out.append("»");
+            out.append(";");
         }
 
         @Override public void enterSequence() {
@@ -62,17 +61,6 @@ public abstract class AbstractVisitorTest {
         meta.getGuideTo(object).guide(visitor);
     }
 
-    protected Visitor logging(Visitor visitor) {
-        return new VisitorDecorator(visitor) {
-            @Override
-            public void visitScalar(Object value) {
-                log.debug("start visit scalar '{}'", value);
-                super.visitScalar(value);
-                log.debug("end visit scalar '{}'", value);
-            }
-        };
-    }
-
     @Test
     public void shouldVisitStringScalar() {
         tour("hello world");
@@ -86,7 +74,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{one:«<a>»|two:«<b>»}");
+        assertThat(visitor).hasToString("{one:<a>;|two:<b>;}");
     }
 
     protected abstract Object createFlatMapping();
@@ -97,7 +85,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{mappingOne:«{one:«<a>»|two:«<b>»}»}");
+        assertThat(visitor).hasToString("{mappingOne:{one:<a>;|two:<b>;};}");
     }
 
     protected abstract Object createNestedMapping();
@@ -130,7 +118,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{a:«[<x>,<y>,<z>]»|b:«[]»|c:«[<x>]»}");
+        assertThat(visitor).hasToString("{a:[<x>,<y>,<z>];|b:[];|c:[<x>];}");
     }
 
     protected abstract Object createMappingWithSequence();
@@ -141,7 +129,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("[{one:«<a>»|two:«<b>»},{},{two:«<b>»}]");
+        assertThat(visitor).hasToString("[{one:<a>;|two:<b>;},{},{two:<b>;}]");
     }
 
     protected abstract Object createSequenceWithMapping();
