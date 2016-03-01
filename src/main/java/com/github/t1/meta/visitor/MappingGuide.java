@@ -1,6 +1,6 @@
-package com.github.t1.meta3.visitor;
+package com.github.t1.meta.visitor;
 
-import com.github.t1.meta3.Property;
+import com.github.t1.meta.Property;
 import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.atomic.AtomicBoolean;

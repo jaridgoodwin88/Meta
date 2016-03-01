@@ -1,4 +1,4 @@
-package com.github.t1.meta3.visitor;
+package com.github.t1.meta.visitor;
 
 import lombok.NonNull;
 

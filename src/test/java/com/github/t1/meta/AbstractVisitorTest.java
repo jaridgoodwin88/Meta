@@ -1,6 +1,6 @@
-package com.github.t1.meta3;
+package com.github.t1.meta;
 
-import com.github.t1.meta3.visitor.Visitor;
+import com.github.t1.meta.visitor.Visitor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

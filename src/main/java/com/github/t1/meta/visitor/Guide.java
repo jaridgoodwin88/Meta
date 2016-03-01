@@ -1,4 +1,4 @@
-package com.github.t1.meta3.visitor;
+package com.github.t1.meta.visitor;
 
 public abstract class Guide {
     public void guide(Visitor visitor) {

@@ -1,7 +1,7 @@
-package com.github.t1.meta3;
+package com.github.t1.meta;
 
-import com.github.t1.meta3.visitor.Guide;
-import com.github.t1.meta3.visitor.GuideFactory;
+import com.github.t1.meta.visitor.Guide;
+import com.github.t1.meta.visitor.GuideFactory;
 
 public class Meta {
     private final GuideFactory guideFactory = new GuideFactory();
