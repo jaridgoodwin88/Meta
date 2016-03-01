@@ -2,7 +2,6 @@ package com.github.t1.meta.visitor;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -12,10 +11,9 @@ public abstract class SequenceGuide extends Guide {
     @Override public void guide(Visitor visitor) {
         super.guide(visitor);
         visitor.enterSequence();
-        AtomicInteger index = new AtomicInteger(0);
+        Continue continueMapping = new Continue(visitor::continueSequence);
         getItems().forEach(item -> {
-                    if (index.getAndIncrement() > 0)
-                        visitor.continueSequence();
+                    continueMapping.call();
                     guideFactory.guideTo(item).guide(visitor);
                 }
         );

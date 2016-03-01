@@ -3,7 +3,6 @@ package com.github.t1.meta.visitor;
 import com.github.t1.meta.Property;
 import lombok.RequiredArgsConstructor;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -14,12 +13,11 @@ public abstract class MappingGuide extends Guide {
     public void guide(Visitor visitor) {
         super.guide(visitor);
         visitor.enterMapping();
-        AtomicBoolean first = new AtomicBoolean(true);
+        Continue continueMapping = new Continue(visitor::continueMapping);
         getProperties().forEach(property -> {
             Object value = property.getValue();
             if (value != null) {
-                if (!first.getAndSet(false))
-                    visitor.continueMapping();
+                continueMapping.call();
                 visitor.enterProperty(property.getName());
                 guideFactory.guideTo(value).guide(visitor);
                 visitor.leaveProperty();
