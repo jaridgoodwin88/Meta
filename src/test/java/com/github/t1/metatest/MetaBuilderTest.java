@@ -1,4 +1,4 @@
-package com.github.t1.meta;
+package com.github.t1.metatest;
 
 public class MetaBuilderTest {
 }

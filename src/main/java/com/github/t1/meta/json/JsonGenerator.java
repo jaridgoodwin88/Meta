@@ -14,8 +14,6 @@ public class JsonGenerator extends Visitor {
 
     @Override public void enterProperty(String key) { out.append("\"").append(key).append("\":"); }
 
-    @Override public void leaveProperty() { }
-
 
     @Override public void enterSequence() { out.append("["); }
 

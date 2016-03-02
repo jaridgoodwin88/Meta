@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class Visitor {
-    @Getter
-    @Setter
-    protected Guide guide;
+    @Getter @Setter protected Guide guide;
 
     public void enterMapping() {}
 

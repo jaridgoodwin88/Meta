@@ -11,7 +11,7 @@ Typical use-cases for programming at a meta level:
 ## Principles
 
 Data consists of scalars (atomic types), sequences (repeated values), and mappings (a sequence of key-value pairs).
-Data can be represented in various formats, pojos, collections, xml, json, or yaml documents, to name just a few.
+Data can be represented in various formats, POJOs, collections, xml, json, or yaml documents, to name just a few.
 All of these formats have some meta data, like whitespace, comments, type/schema information, distinction between attributes
 and elements, read-only flags, and much more.
 While all data formats should be able to represent all data, meta data is often specific to one such representation and invalid in others.

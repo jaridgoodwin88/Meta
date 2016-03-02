@@ -1,5 +1,6 @@
-package com.github.t1.meta;
+package com.github.t1.metatest;
 
+import com.github.t1.meta.Meta;
 import com.github.t1.meta.json.JsonGenerator;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
@@ -11,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonGeneratorTest {
     private static final double PI = 3.14159;
-    Meta meta = new Meta();
-    JsonGenerator generator = new JsonGenerator();
+    private final Meta meta = new Meta();
+    private final JsonGenerator generator = new JsonGenerator();
 
     @Test
     public void shouldGenerateJsonObject() {

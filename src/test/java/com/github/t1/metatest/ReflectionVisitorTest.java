@@ -1,4 +1,4 @@
-package com.github.t1.meta;
+package com.github.t1.metatest;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Data;

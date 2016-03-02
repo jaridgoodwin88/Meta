@@ -1,5 +1,6 @@
-package com.github.t1.meta;
+package com.github.t1.metatest;
 
+import com.github.t1.meta.Meta;
 import com.github.t1.meta.visitor.Visitor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -19,9 +20,9 @@ public abstract class AbstractVisitorTest {
     private static final double SOME_FLOAT = 123.4;
     private static final double SOME_DOUBLE = 123.45d;
 
-    Meta meta = new Meta();
+    private final Meta meta = new Meta();
 
-    Visitor visitor = new Visitor() {
+    final Visitor visitor = new Visitor() {
         private final StringBuilder out = new StringBuilder();
 
         @Override public void enterMapping() {
