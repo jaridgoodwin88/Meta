@@ -2,11 +2,13 @@ package com.github.t1.meta;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Data
@@ -56,5 +58,20 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
         Pojo c = new Pojo();
         c.one = null;
         return ImmutableList.of(new Pojo(), new Object(), c);
+    }
+
+    @Test
+    public void shouldVisitSubclass() {
+        class Super {
+            String superField = "super";
+        }
+        class Sub extends Super {
+            String subField = "sub";
+        }
+        Sub sub = new Sub();
+
+        tour(sub);
+
+        assertThat(visitor).hasToString("{superField:<super>;|subField:<sub>;}");
     }
 }
