@@ -1,18 +1,15 @@
 package com.github.t1.meta.visitor;
 
 import com.github.t1.meta.Property;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 class MapGuide extends MappingGuide {
     private final Map<?, ?> map;
-
-    MapGuide(GuideFactory guideFactory, Map<?, ?> map) {
-        super(guideFactory);
-        this.map = map;
-    }
 
     @Override protected Stream<Property> getProperties() {
         return map.entrySet().stream().map(MapProperty::new);

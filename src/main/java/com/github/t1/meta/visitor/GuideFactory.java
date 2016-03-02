@@ -11,15 +11,22 @@ import java.util.Map;
 public class GuideFactory {
     private final StringConvert convert;
 
-    @SuppressWarnings("ChainOfInstanceofChecks") public Guide guideTo(@NonNull Object object) {
+    public Guide getGuideTo(@NonNull Object object) {
+        Guide guide = createGuide(object);
+        guide.setFactory(this);
+        return guide;
+    }
+
+    @SuppressWarnings("ChainOfInstanceofChecks")
+    private Guide createGuide(@NonNull Object object) {
         if (convert.isConvertible(object.getClass()))
-            return new StringConvertScalarGuide(convert, object);
+            return new ScalarGuide(convert, object);
         if (object instanceof Map)
-            return new MapGuide(this, (Map<?, ?>) object);
+            return new MapGuide((Map<?, ?>) object);
         if (object instanceof Collection)
-            return new CollectionGuide(this, (Collection<?>) object);
+            return new CollectionGuide((Collection<?>) object);
         if (object.getClass().isArray())
-            return new ArrayGuide(this, object);
-        return new ReflectionGuide(this, object);
+            return new ArrayGuide(object);
+        return new ReflectionGuide(object);
     }
 }

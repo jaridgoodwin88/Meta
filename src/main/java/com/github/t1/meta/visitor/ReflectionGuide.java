@@ -1,6 +1,7 @@
 package com.github.t1.meta.visitor;
 
 import com.github.t1.meta.Property;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.Value;
 
@@ -12,13 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 class ReflectionGuide extends MappingGuide {
     private final Object object;
-
-    public ReflectionGuide(GuideFactory guideFactory, Object object) {
-        super(guideFactory);
-        this.object = object;
-    }
 
     @Override protected Stream<Property> getProperties() {
         return classHierarchy(object.getClass())

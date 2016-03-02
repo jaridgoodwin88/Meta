@@ -26,7 +26,7 @@ public class JsonGeneratorTest {
         }
         Pojo pojo = new Pojo();
 
-        meta.getGuideTo(pojo).guide(generator);
+        meta.visitTo(pojo).by(generator).run();
 
         assertThat(generator).hasToString(""
                 + "{"
@@ -47,7 +47,7 @@ public class JsonGeneratorTest {
                 "four", true,
                 "five", TEN);
 
-        meta.getGuideTo(map).guide(generator);
+        meta.visitTo(map).by(generator).run();
 
         assertThat(generator).hasToString(""
                 + "{"
@@ -63,7 +63,7 @@ public class JsonGeneratorTest {
     public void shouldGenerateJsonArrayFromList() {
         ImmutableList<?> list = ImmutableList.of("a", "b", PI, true, TEN);
 
-        meta.getGuideTo(list).guide(generator);
+        meta.visitTo(list).by(generator).run();
 
         assertThat(generator).hasToString("[\"a\",\"b\",3.14159,true,10]");
     }
@@ -72,7 +72,7 @@ public class JsonGeneratorTest {
     public void shouldGenerateJsonArrayFromArray() {
         Object[] array = new Object[] { "a", "b", PI, true, TEN };
 
-        meta.getGuideTo(array).guide(generator);
+        meta.visitTo(array).by(generator).run();
 
         assertThat(generator).hasToString("[\"a\",\"b\",3.14159,true,10]");
     }

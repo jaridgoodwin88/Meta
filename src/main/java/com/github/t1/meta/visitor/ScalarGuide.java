@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.joda.convert.StringConvert;
 
 @RequiredArgsConstructor
-public class StringConvertScalarGuide extends Guide {
+public class ScalarGuide extends Guide {
     private final StringConvert convert;
     private final Object object;
 
-    @Override public void guide(Visitor visitor) {
-        super.guide(visitor);
-        visitor.visitScalar(object);
+    @Override public void run(Visit visit) {
+        visit.getVisitor().visitScalar(object);
     }
 }

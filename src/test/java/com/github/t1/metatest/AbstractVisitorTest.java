@@ -67,7 +67,7 @@ public abstract class AbstractVisitorTest {
     };
 
     void tour(Object object) {
-        meta.getGuideTo(object).guide(visitor);
+        meta.visitTo(object).by(visitor).run();
     }
 
     @Test

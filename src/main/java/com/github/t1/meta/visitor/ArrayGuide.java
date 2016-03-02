@@ -1,15 +1,13 @@
 package com.github.t1.meta.visitor;
 
+import lombok.RequiredArgsConstructor;
+
 import java.lang.reflect.Array;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 class ArrayGuide extends SequenceGuide {
     private final Object array;
-
-    ArrayGuide(GuideFactory guideFactory, Object array) {
-        super(guideFactory);
-        this.array = array;
-    }
 
     @Override protected Stream<?> getItems() {
         Stream.Builder<Object> stream = Stream.builder();

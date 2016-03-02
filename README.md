@@ -16,6 +16,13 @@ All of these formats have some meta data, like whitespace, comments, type/schema
 and elements, read-only flags, and much more.
 While all data formats should be able to represent all data, meta data is often specific to one such representation and invalid in others.
 
+## TODOs
+
+* Pretty-print JSON
+* JSON guide
+* XML guide
+* XML generator
+
 ## Challenges
 
 Things not yet implemented that can potentially kill the purpose of the whole project:

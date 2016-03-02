@@ -1,20 +1,15 @@
 package com.github.t1.meta.visitor;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor
 public abstract class SequenceGuide extends Guide {
-    private final GuideFactory guideFactory;
-
-    @Override public void guide(Visitor visitor) {
-        super.guide(visitor);
+    @Override public void run(Visit visit) {
+        Visitor visitor = visit.getVisitor();
         visitor.enterSequence();
         Continue continueMapping = new Continue(visitor::continueSequence);
         getItems().forEach(item -> {
             continueMapping.call();
-            guideFactory.guideTo(item).guide(visitor);
+            visit.to(item);
         });
         visitor.leaveSequence();
     }

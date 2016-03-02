@@ -3,6 +3,10 @@ package com.github.t1.meta.visitor;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * This is <em>not</em> the GoF Visitor pattern, as we can't do the polymorphic type resolution
+ * trick with types we can't control. Instead we are forced to use <code>instanceof</code>.
+ */
 public abstract class Visitor {
     @Getter @Setter protected Guide guide;
 
