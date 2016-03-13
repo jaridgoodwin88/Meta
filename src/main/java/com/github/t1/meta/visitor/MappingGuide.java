@@ -11,7 +11,9 @@ public abstract class MappingGuide extends Guide {
         Continue continueMapping = new Continue(visitor::continueMapping);
         getProperties().forEach(property -> {
             Object value = property.getValue();
-            if (value != null) {
+            if (value == null) {
+                visitor.visitNull();
+            } else {
                 continueMapping.call();
                 visitor.enterProperty(property.getName());
                 visit.to(value);

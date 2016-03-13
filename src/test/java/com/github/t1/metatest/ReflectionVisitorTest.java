@@ -7,8 +7,8 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.util.List;
 
-import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.Collections.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Data
@@ -25,6 +25,7 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
         public volatile String ignoreMeToo = "y";
 
         private String one = "a", two = "b";
+        private Object nil = null;
     }
 
     @Override protected Object createFlatMapping() {
@@ -36,7 +37,7 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
     }
 
     @Override protected Object createFlatSequence() {
-        return new String[] { "a", "b", "c" };
+        return new String[] { "a", "b", null, "c" };
     }
 
     @Override protected Object createNestedSequence() {
@@ -45,7 +46,7 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
 
     @Data
     public static class MappingWithSequence {
-        String[] a = { "x", "y", "z" };
+        String[] a = { "x", "y", null, "z" };
         List<String> b = emptyList();
         List<String> c = ImmutableList.of("x");
     }

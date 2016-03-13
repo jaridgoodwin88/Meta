@@ -1,11 +1,18 @@
 package com.github.t1.metatest;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
+
+import java.util.*;
+
+import static java.util.Arrays.*;
 
 public class CollectionsVisitorTest extends AbstractVisitorTest {
-    @Override protected Object createFlatMapping() {
-        return ImmutableMap.of("one", "a", "two", "b");
+    @Override protected Map<Object, Object> createFlatMapping() {
+        Map<Object, Object> map = new LinkedHashMap<>();
+        map.put("one", "a");
+        map.put("two", "b");
+        map.put("nil", null);
+        return map;
     }
 
     @Override protected Object createNestedMapping() {
@@ -13,7 +20,7 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
     }
 
     @Override protected Object createFlatSequence() {
-        return ImmutableList.of("a", "b", "c");
+        return asList("a", "b", null, "c");
     }
 
     @Override protected Object createNestedSequence() {
@@ -22,15 +29,19 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
 
     @Override protected Object createMappingWithSequence() {
         return ImmutableMap.of(
-                "a", ImmutableList.of("x", "y", "z"),
+                "a", asList("x", "y", null, "z"),
                 "b", ImmutableList.of(),
                 "c", ImmutableList.of("x"));
     }
 
     @Override protected Object createSequenceWithMapping() {
+        Map<Object, Object> map3 = new LinkedHashMap<>();
+        map3.put("one", null);
+        map3.put("two", "b");
+        map3.put("nil", null);
         return ImmutableList.of(
-                ImmutableMap.of("one", "a", "two", "b"),
+                createFlatMapping(),
                 ImmutableMap.of(),
-                ImmutableMap.of("two", "b"));
+                map3);
     }
 }

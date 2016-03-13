@@ -1,4 +1,4 @@
-package com.github.t1.meta.json;
+package com.github.t1.meta.out;
 
 import com.github.t1.meta.visitor.Visitor;
 
@@ -22,7 +22,7 @@ public class JsonGenerator extends Visitor {
     @Override public void leaveSequence() { out.append("]"); }
 
 
-    @Override public void visitBoolean(Boolean value) { out.append(value); }
+    @Override public void visitBoolean(boolean value) { out.append(value); }
 
     @Override public void visitNumber(Number value) { out.append(value); }
 

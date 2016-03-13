@@ -7,11 +7,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
@@ -49,6 +48,10 @@ public abstract class AbstractVisitorTest {
             out.append("[");
         }
 
+        @Override public void enterItem() { out.append("«"); }
+
+        @Override public void leaveItem() { out.append("»"); }
+
         @Override public void continueSequence() {
             out.append(",");
         }
@@ -60,6 +63,8 @@ public abstract class AbstractVisitorTest {
         @Override public void visitScalar(Object value) {
             out.append("<").append(value).append(">");
         }
+
+        @Override public void visitNull() { out.append('•'); }
 
         @Override public String toString() {
             return out.toString();
@@ -171,7 +176,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{one:<a>;|two:<b>;}");
+        assertThat(visitor).hasToString("{one:<a>;|two:<b>;•}");
     }
 
     protected abstract Object createFlatMapping();
@@ -182,7 +187,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{mappingOne:{one:<a>;|two:<b>;};}");
+        assertThat(visitor).hasToString("{mappingOne:{one:<a>;|two:<b>;•};}");
     }
 
     protected abstract Object createNestedMapping();
@@ -193,7 +198,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("[<a>,<b>,<c>]");
+        assertThat(visitor.toString()).isEqualTo("[«<a>»,«<b>»•,«<c>»]");
     }
 
     protected abstract Object createFlatSequence();
@@ -204,7 +209,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("[[<a1>,<a2>,<a3>],[],[<c1>]]");
+        assertThat(visitor).hasToString("[«[«<a1>»,«<a2>»,«<a3>»]»,«[]»,«[«<c1>»]»]");
     }
 
     protected abstract Object createNestedSequence();
@@ -215,7 +220,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("{a:[<x>,<y>,<z>];|b:[];|c:[<x>];}");
+        assertThat(visitor).hasToString("{a:[«<x>»,«<y>»•,«<z>»];|b:[];|c:[«<x>»];}");
     }
 
     protected abstract Object createMappingWithSequence();
@@ -226,7 +231,7 @@ public abstract class AbstractVisitorTest {
 
         tour(object);
 
-        assertThat(visitor).hasToString("[{one:<a>;|two:<b>;},{},{two:<b>;}]");
+        assertThat(visitor).hasToString("[«{one:<a>;|two:<b>;•}»,«{}»,«{•two:<b>;•}»]");
     }
 
     protected abstract Object createSequenceWithMapping();

@@ -1,79 +1,116 @@
 package com.github.t1.metatest;
 
 import com.github.t1.meta.Meta;
-import com.github.t1.meta.json.JsonGenerator;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.github.t1.meta.out.JsonGenerator;
+import com.google.common.collect.*;
 import org.junit.Test;
 
 import java.math.BigInteger;
 
-import static java.math.BigInteger.TEN;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.math.BigInteger.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class JsonGeneratorTest {
     private static final double PI = 3.14159;
     private final Meta meta = new Meta();
     private final JsonGenerator generator = new JsonGenerator();
 
+    @SuppressWarnings("unused")
+    private static class Pojo {
+        String string = "a";
+        double number = PI;
+        boolean bool = true;
+        BigInteger big = TEN;
+        Object nil = null;
+    }
+
+    private final ImmutableMap<?, ?> map = ImmutableMap.of(
+            "string", "a",
+            "number", PI,
+            "bool", true,
+            "big", TEN);
+
+    private final Object[] array = new Object[] { "a", PI, true, TEN, null };
+
+    private final ImmutableList<?> list = ImmutableList.of("a", PI, true, TEN);
+
     @Test
-    public void shouldGenerateJsonObjectFromPojo() {
-        class Pojo {
-            String one = "a", two = "b";
-            double three = PI;
-            boolean four = true;
-            BigInteger five = TEN;
-        }
+    public void shouldGeneratePlainJsonObjectFromPojo() {
         Pojo pojo = new Pojo();
 
         meta.visitTo(pojo).by(generator).run();
 
         assertThat(generator).hasToString(""
                 + "{"
-                + "\"one\":\"a\","
-                + "\"two\":\"b\","
-                + "\"three\":3.14159,"
-                + "\"four\":true,"
-                + "\"five\":10"
+                + "\"string\":\"a\","
+                + "\"number\":3.14159,"
+                + "\"bool\":true,"
+                + "\"big\":10"
+                + "}");
+    }
+
+    @Test
+    public void shouldGenerateJsonObjectFromNestedPojo() {
+        @SuppressWarnings("unused")
+        class Container {
+            Pojo pojo = new Pojo();
+            Object[] array = JsonGeneratorTest.this.array;
+            Object[] nested = { new Pojo(), true };
+        }
+        Container container = new Container();
+
+        meta.visitTo(container).by(generator).run();
+
+        assertThat(generator.toString()).isEqualTo(""
+                + "{"
+                + "\"pojo\":{"
+                + "\"string\":\"a\","
+                + "\"number\":3.14159,"
+                + "\"bool\":true,"
+                + "\"big\":10"
+                + "},"
+                + "\"array\":["
+                + "\"a\","
+                + "3.14159,"
+                + "true,"
+                + "10"
+                + "],"
+                + "\"nested\":["
+                + "{"
+                + "\"string\":\"a\","
+                + "\"number\":3.14159,"
+                + "\"bool\":true,"
+                + "\"big\":10"
+                + "},"
+                + "true"
+                + "]"
                 + "}");
     }
 
     @Test
     public void shouldGenerateJsonObjectFromMap() {
-        ImmutableMap<?, ?> map = ImmutableMap.of(
-                "one", "a",
-                "two", "b",
-                "three", PI,
-                "four", true,
-                "five", TEN);
-
         meta.visitTo(map).by(generator).run();
 
         assertThat(generator).hasToString(""
                 + "{"
-                + "\"one\":\"a\","
-                + "\"two\":\"b\","
-                + "\"three\":3.14159,"
-                + "\"four\":true,"
-                + "\"five\":10"
+                + "\"string\":\"a\","
+                + "\"number\":3.14159,"
+                + "\"bool\":true,"
+                + "\"big\":10"
                 + "}");
     }
 
     @Test
     public void shouldGenerateJsonArrayFromList() {
-        ImmutableList<?> list = ImmutableList.of("a", "b", PI, true, TEN);
-
         meta.visitTo(list).by(generator).run();
 
-        assertThat(generator).hasToString("[\"a\",\"b\",3.14159,true,10]");
+        assertThat(generator).hasToString("[\"a\",3.14159,true,10]");
     }
 
     @Test
     public void shouldGenerateJsonArrayFromArray() {
-        Object[] array = new Object[] { "a", "b", PI, true, TEN };
-
         meta.visitTo(array).by(generator).run();
 
-        assertThat(generator).hasToString("[\"a\",\"b\",3.14159,true,10]");
+        assertThat(generator).hasToString("[\"a\",3.14159,true,10]");
     }
 }

@@ -1,11 +1,9 @@
 package com.github.t1.meta.visitor;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.joda.convert.StringConvert;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class GuideFactory {

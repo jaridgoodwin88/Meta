@@ -8,8 +8,14 @@ public abstract class SequenceGuide extends Guide {
         visitor.enterSequence();
         Continue continueMapping = new Continue(visitor::continueSequence);
         getItems().forEach(item -> {
-            continueMapping.call();
-            visit.to(item);
+            if (item == null) {
+                visitor.visitNull();
+            } else {
+                continueMapping.call();
+                visitor.enterItem();
+                visit.to(item);
+                visitor.leaveItem();
+            }
         });
         visitor.leaveSequence();
     }

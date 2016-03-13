@@ -2,11 +2,13 @@ package com.github.t1.meta.visitor;
 
 import lombok.*;
 
-import static lombok.AccessLevel.PACKAGE;
-import static lombok.AccessLevel.PRIVATE;
+import java.util.Stack;
+
+import static lombok.AccessLevel.*;
 
 public abstract class Guide {
     @Setter(PACKAGE) private GuideFactory factory;
+    @Getter private Object destination;
 
     @Builder
     @AllArgsConstructor(access = PRIVATE)
@@ -14,16 +16,23 @@ public abstract class Guide {
         @NonNull @Getter private final Object destination;
         @NonNull @Getter private final Visitor visitor;
         @NonNull private final GuideFactory guideFactory;
-
-        private Guide mainGuide;
+        private final Stack<Guide> guides = new Stack<>();
 
         public void run() {
-            this.mainGuide = guideFactory.getGuideTo(destination);
-            this.mainGuide.run(this);
+            visitor.visit = this;
+            to(destination);
         }
 
-        public void to(Object stopover) {
-            guideFactory.getGuideTo(stopover).run(this);
+        public void to(Object destination) {
+            Guide guide = guideFactory.getGuideTo(destination);
+            guide.destination = destination;
+            guides.push(guide);
+            guide.run(this);
+            guides.pop();
+        }
+
+        public Guide currentGuide() {
+            return guides.peek();
         }
     }
 
