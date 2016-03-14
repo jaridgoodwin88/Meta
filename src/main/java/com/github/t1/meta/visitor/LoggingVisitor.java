@@ -62,7 +62,7 @@ public class LoggingVisitor extends VisitorDecorator {
 
 
     public void visitScalar(Object value) {
-        log.debug("visitScalar");
+        log.debug("visitScalar: {}", value);
         super.visitScalar(value);
     }
 }
