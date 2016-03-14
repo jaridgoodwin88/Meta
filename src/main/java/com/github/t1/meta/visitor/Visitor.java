@@ -1,6 +1,7 @@
 package com.github.t1.meta.visitor;
 
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.math.*;
 
@@ -10,9 +11,10 @@ import java.math.*;
  */
 @SuppressWarnings("UnusedParameters")
 public abstract class Visitor {
+    @Setter @Accessors(fluent = true, chain = true) private Visitor self = this;
     @Setter Guide.Visit visit;
 
-    public Guide guide() { return visit.currentGuide(); }
+    public Guide guide() { return self.visit.currentGuide(); }
 
     public void enterMapping() {}
 
@@ -22,7 +24,7 @@ public abstract class Visitor {
 
 
     public void enterProperty(Object key) {
-        enterProperty((key == null) ? null : key.toString());
+        self.enterProperty((key == null) ? null : key.toString());
     }
 
     public void enterProperty(String key) {}
@@ -43,34 +45,34 @@ public abstract class Visitor {
 
     @SuppressWarnings("ChainOfInstanceofChecks") public void visitScalar(Object value) {
         if (value instanceof Boolean)
-            visitBoolean((Boolean) value);
+            self.visitBoolean((Boolean) value);
         else if (value instanceof Number)
-            visitNumber((Number) value);
+            self.visitNumber((Number) value);
         else
-            visitOtherScalar(value);
+            self.visitOtherScalar(value);
     }
 
     public void visitBoolean(boolean value) {}
 
     @SuppressWarnings("ChainOfInstanceofChecks") public void visitNumber(Number value) {
         if (value instanceof Byte)
-            visitByte((byte) value);
+            self.visitByte((byte) value);
         else if (value instanceof Short)
-            visitShort((short) value);
+            self.visitShort((short) value);
         else if (value instanceof Integer)
-            visitInteger((int) value);
+            self.visitInteger((int) value);
         else if (value instanceof Long)
-            visitLong((long) value);
+            self.visitLong((long) value);
         else if (value instanceof Float)
-            visitFloat((float) value);
+            self.visitFloat((float) value);
         else if (value instanceof Double)
-            visitDouble((double) value);
+            self.visitDouble((double) value);
         else if (value instanceof BigDecimal)
-            visitBigDecimal((BigDecimal) value);
+            self.visitBigDecimal((BigDecimal) value);
         else if (value instanceof BigInteger)
-            visitBigInteger((BigInteger) value);
+            self.visitBigInteger((BigInteger) value);
         else
-            visitOtherNumber(value);
+            self.visitOtherNumber(value);
     }
 
     public void visitNull() {}
