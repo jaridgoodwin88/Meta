@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.*;
 import java.time.LocalDate;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -232,6 +233,32 @@ public abstract class AbstractVisitorTest {
         tour(object);
 
         assertThat(visitor).hasToString("[«{one:<a>;|two:<b>;•}»,«{}»,«{•two:<b>;•}»]");
+    }
+
+    @Test
+    public void shouldGetDepthsSequenceWithMapping() {
+        List<Integer> depths = new ArrayList<>();
+        Object object = createSequenceWithMapping();
+
+        meta.visitTo(object).by(new Visitor() {
+            @Override public void enterMapping() {
+                depths.add(guide().depth());
+            }
+
+            @Override public void enterProperty(String key) {
+                depths.add(guide().depth());
+            }
+
+            @Override public void enterSequence() {
+                depths.add(guide().depth());
+            }
+
+            @Override public void visitScalar(Object value) {
+                depths.add(guide().depth());
+            }
+        }).run();
+
+        assertThat(depths).containsExactly(0, 1, 1, 2, 1, 2, 1, 1, 1, 2);
     }
 
     protected abstract Object createSequenceWithMapping();

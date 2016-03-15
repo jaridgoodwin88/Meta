@@ -9,14 +9,8 @@ import java.util.*;
 public class GuideFactory {
     private final StringConvert convert;
 
-    public Guide getGuideTo(@NonNull Object object) {
-        Guide guide = createGuide(object);
-        guide.setFactory(this);
-        return guide;
-    }
-
     @SuppressWarnings("ChainOfInstanceofChecks")
-    private Guide createGuide(@NonNull Object object) {
+    public Guide getGuideTo(@NonNull Object object) {
         if (convert.isConvertible(object.getClass()))
             return new ScalarGuide(convert, object);
         if (object instanceof Map)

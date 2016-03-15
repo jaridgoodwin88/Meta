@@ -7,27 +7,43 @@ import java.util.Stack;
 import static lombok.AccessLevel.*;
 
 public abstract class Guide {
-    @Setter(PACKAGE) private GuideFactory factory;
-    @Getter private Object destination;
+    @Getter private Visit visit;
+
+    public int depth() {
+        return visit.guides.size() - 1; // root is 0
+    }
+
+    public Object destination() { return visit.destinations.peek(); }
 
     @Builder
     @AllArgsConstructor(access = PRIVATE)
     public static class Visit {
-        @NonNull @Getter private final Object destination;
+        public static class VisitBuilder {
+            private Stack<Object> destinations = new Stack<>();
+
+            public VisitBuilder destination(Object destination) {
+                destinations.push(destination);
+                return this;
+            }
+        }
+
         @NonNull @Getter private final Visitor visitor;
         @NonNull private final GuideFactory guideFactory;
+        private final Stack<Object> destinations;
         private final Stack<Guide> guides = new Stack<>();
 
         public void run() {
             visitor.visit = this;
-            to(destination);
+            to(destinations.peek());
         }
 
         public void to(Object destination) {
             Guide guide = guideFactory.getGuideTo(destination);
-            guide.destination = destination;
+            guide.visit = this;
             guides.push(guide);
+            destinations.push(destination);
             guide.run(this);
+            destinations.pop();
             guides.pop();
         }
 
