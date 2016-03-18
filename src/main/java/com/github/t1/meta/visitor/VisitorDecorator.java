@@ -1,71 +1,82 @@
 package com.github.t1.meta.visitor;
 
-import lombok.NonNull;
+import lombok.*;
 
 import java.math.*;
 
 public class VisitorDecorator extends Visitor {
-    @NonNull
-    private final Visitor delegate;
+    @NonNull @Getter private Visitor delegate;
 
-    public VisitorDecorator(Visitor delegate) {
-        this.delegate = delegate.self(this);
+    public VisitorDecorator(Visitor delegate) { setDelegate(delegate); }
+
+    public void setDelegate(Visitor delegate) {
+        this.delegate = delegate;
+        delegate.setSelf(this.getSelf());
+        delegate.setVisit(this.getSelf().getVisit());
     }
 
-    public Guide guide() { return visit.currentGuide(); }
+    @Override public void setSelf(Visitor self) {
+        delegate.setSelf(self);
+        super.setSelf(self);
+    }
 
-    public void enterMapping() { delegate.enterMapping(); }
+    @Override public void setVisit(Guide.Visit visit) {
+        delegate.setVisit(visit);
+        super.setVisit(visit);
+    }
 
-    public void continueMapping() { delegate.continueMapping(); }
+    @Override public Guide guide() { return delegate.guide(); }
 
-    public void leaveMapping() { delegate.leaveMapping(); }
+    @Override public void enterMapping() { delegate.enterMapping(); }
 
+    @Override public void continueMapping() { delegate.continueMapping(); }
 
-    public void enterProperty(Object key) { delegate.enterProperty(key); }
-
-    public void enterProperty(String key) { delegate.enterProperty(key); }
-
-    public void leaveProperty() { delegate.leaveProperty(); }
-
-
-    public void enterSequence() { delegate.enterSequence(); }
-
-    public void enterItem() { delegate.enterItem(); }
-
-    public void continueSequence() { delegate.continueSequence(); }
-
-    public void leaveItem() { delegate.leaveItem(); }
-
-    public void leaveSequence() { delegate.leaveSequence(); }
+    @Override public void leaveMapping() { delegate.leaveMapping(); }
 
 
-    @SuppressWarnings("ChainOfInstanceofChecks")
-    public void visitScalar(Object value) { delegate.visitScalar(value); }
+    @Override public void enterProperty(Object key) { delegate.enterProperty(key); }
 
-    public void visitBoolean(boolean value) { delegate.visitBoolean(value); }
+    @Override public void enterProperty(String key) { delegate.enterProperty(key); }
 
-    @SuppressWarnings("ChainOfInstanceofChecks")
-    public void visitNumber(Number value) { delegate.visitNumber(value); }
+    @Override public void leaveProperty() { delegate.leaveProperty(); }
 
-    public void visitNull() { delegate.visitNull(); }
 
-    public void visitByte(byte value) { delegate.visitByte(value); }
+    @Override public void enterSequence() { delegate.enterSequence(); }
 
-    public void visitShort(short value) { delegate.visitShort(value); }
+    @Override public void enterItem() { delegate.enterItem(); }
 
-    public void visitInteger(int value) { delegate.visitInteger(value); }
+    @Override public void continueSequence() { delegate.continueSequence(); }
 
-    public void visitLong(long value) { delegate.visitLong(value); }
+    @Override public void leaveItem() { delegate.leaveItem(); }
 
-    public void visitFloat(float value) { delegate.visitFloat(value); }
+    @Override public void leaveSequence() { delegate.leaveSequence(); }
 
-    public void visitDouble(double value) { delegate.visitDouble(value); }
 
-    public void visitBigDecimal(BigDecimal value) { delegate.visitBigDecimal(value); }
+    @Override public void visitScalar(Object value) { delegate.visitScalar(value); }
 
-    public void visitBigInteger(BigInteger value) { delegate.visitBigInteger(value); }
+    @Override public void visitBoolean(boolean value) { delegate.visitBoolean(value); }
 
-    public void visitOtherNumber(Number value) { delegate.visitOtherNumber(value); }
+    @Override public void visitNumber(Number value) { delegate.visitNumber(value); }
 
-    public void visitOtherScalar(Object value) { delegate.visitOtherScalar(value); }
+    @Override public void visitNull() { delegate.visitNull(); }
+
+    @Override public void visitByte(byte value) { delegate.visitByte(value); }
+
+    @Override public void visitShort(short value) { delegate.visitShort(value); }
+
+    @Override public void visitInteger(int value) { delegate.visitInteger(value); }
+
+    @Override public void visitLong(long value) { delegate.visitLong(value); }
+
+    @Override public void visitFloat(float value) { delegate.visitFloat(value); }
+
+    @Override public void visitDouble(double value) { delegate.visitDouble(value); }
+
+    @Override public void visitBigDecimal(BigDecimal value) { delegate.visitBigDecimal(value); }
+
+    @Override public void visitBigInteger(BigInteger value) { delegate.visitBigInteger(value); }
+
+    @Override public void visitOtherNumber(Number value) { delegate.visitOtherNumber(value); }
+
+    @Override public void visitOtherScalar(Object value) { delegate.visitOtherScalar(value); }
 }

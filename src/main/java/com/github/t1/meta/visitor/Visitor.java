@@ -1,7 +1,6 @@
 package com.github.t1.meta.visitor;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.*;
 
 import java.math.*;
 
@@ -11,10 +10,13 @@ import java.math.*;
  */
 @SuppressWarnings("UnusedParameters")
 public abstract class Visitor {
-    @Setter @Accessors(fluent = true, chain = true) private Visitor self = this;
-    @Setter Guide.Visit visit;
+    @Getter @Setter private Visitor self = this;
+    @Getter @Setter private Guide.Visit visit;
 
     public Guide guide() { return self.visit.currentGuide(); }
+
+    public Object destination() { return guide().destination(); }
+
 
     public void enterMapping() {}
 

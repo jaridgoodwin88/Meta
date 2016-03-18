@@ -33,7 +33,7 @@ public abstract class Guide {
         private final Stack<Guide> guides = new Stack<>();
 
         public void run() {
-            visitor.visit = this;
+            visitor.setVisit(this);
             to(destinations.peek());
         }
 
