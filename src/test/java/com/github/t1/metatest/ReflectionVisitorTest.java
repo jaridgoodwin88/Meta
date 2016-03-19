@@ -97,6 +97,6 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
         }).run();
 
         assertThat(property.get().name()).isEqualTo("one");
-        assertThat(property.get().annotations().isAnnotationPresent(Deprecated.class)).isTrue();
+        assertThat(property.get().isAnnotationPresent(Deprecated.class)).isTrue();
     }
 }

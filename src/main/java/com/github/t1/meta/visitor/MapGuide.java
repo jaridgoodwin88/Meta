@@ -3,7 +3,6 @@ package com.github.t1.meta.visitor;
 import lombok.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -23,16 +22,10 @@ class MapGuide extends MappingGuide {
             return entry.getKey();
         }
 
-        @Override public AnnotatedElement annotations() {
-            return new EmptyAnnotations();
-        }
-
         @Override public Object getValue() {
             return entry.getValue();
         }
-    }
 
-    private class EmptyAnnotations implements AnnotatedElement {
         @Override public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
             return null;
         }

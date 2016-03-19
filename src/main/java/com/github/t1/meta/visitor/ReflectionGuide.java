@@ -3,9 +3,13 @@ package com.github.t1.meta.visitor;
 import com.github.t1.stereotypes.Annotations;
 import lombok.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Arrays.*;
 
 @RequiredArgsConstructor
 class ReflectionGuide extends MappingGuide {
@@ -27,7 +31,7 @@ class ReflectionGuide extends MappingGuide {
     }
 
     private Stream<Field> fields(Class<?> type) {
-        return Arrays.asList(type.getDeclaredFields()).stream();
+        return asList(type.getDeclaredFields()).stream();
     }
 
     private boolean isProperty(Field field) {
@@ -44,7 +48,7 @@ class ReflectionGuide extends MappingGuide {
             return field.getName();
         }
 
-        @Override public AnnotatedElement annotations() {
+        private AnnotatedElement annotations() {
             return Annotations.on(field);
         }
 
@@ -52,6 +56,38 @@ class ReflectionGuide extends MappingGuide {
         @Override public Object getValue() {
             field.setAccessible(true);
             return field.get(object);
+        }
+
+        @Override public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+            return annotations().getAnnotation(annotationClass);
+        }
+
+        @Override public Annotation[] getAnnotations() {
+            return annotations().getAnnotations();
+        }
+
+        @Override public Annotation[] getDeclaredAnnotations() {
+            return annotations().getDeclaredAnnotations();
+        }
+
+        @Override public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+            return annotations().isAnnotationPresent(annotationClass);
+        }
+
+        @Override public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
+            return annotations().getAnnotationsByType(annotationClass);
+        }
+
+        @Override public <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass) {
+            return annotations().getDeclaredAnnotation(annotationClass);
+        }
+
+        @Override public <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass) {
+            return annotations().getDeclaredAnnotationsByType(annotationClass);
+        }
+
+        @Override public String toString() {
+            return "Property[" + field.getName() + "]" + asList(getAnnotations());
         }
     }
 }
