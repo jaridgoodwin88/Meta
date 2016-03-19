@@ -1,5 +1,6 @@
 package com.github.t1.meta.out;
 
+import com.github.t1.meta.Property;
 import com.github.t1.meta.visitor.Visitor;
 
 public class JsonGenerator extends Visitor {
@@ -12,7 +13,9 @@ public class JsonGenerator extends Visitor {
     @Override public void leaveMapping() { out.append("}"); }
 
 
-    @Override public void enterProperty(String key) { out.append("\"").append(key).append("\":"); }
+    @Override public void enterProperty(Property property) {
+        out.append("\"").append(property.name()).append("\":");
+    }
 
 
     @Override public void enterSequence() { out.append("["); }

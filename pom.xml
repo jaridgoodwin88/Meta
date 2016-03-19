@@ -216,6 +216,11 @@
             <artifactId>joda-convert</artifactId>
             <version>1.8.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.t1</groupId>
+            <artifactId>stereotype-helper</artifactId>
+            <version>1.0.4-SNAPSHOT</version>
+        </dependency>
 
         <!-- test scope -->
         <dependency>

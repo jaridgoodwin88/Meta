@@ -1,10 +1,8 @@
 package com.github.t1.meta.visitor;
 
-import com.github.t1.meta.Property;
-
 import java.util.stream.Stream;
 
-public abstract class MappingGuide extends Guide {
+abstract class MappingGuide extends Guide {
     @Override public void run(Visit visit) {
         Visitor visitor = visit.getVisitor();
         visitor.enterMapping();
@@ -15,7 +13,7 @@ public abstract class MappingGuide extends Guide {
                 visitor.visitNull();
             } else {
                 continueMapping.call();
-                visitor.enterProperty(property.getName());
+                visitor.enterProperty(property);
                 visit.to(value);
                 visitor.leaveProperty();
             }
@@ -23,5 +21,5 @@ public abstract class MappingGuide extends Guide {
         visitor.leaveMapping();
     }
 
-    protected abstract Stream<Property> getProperties();
+    protected abstract Stream<PropertyWithValue> getProperties();
 }

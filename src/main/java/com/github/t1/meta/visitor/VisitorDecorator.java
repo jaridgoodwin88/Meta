@@ -1,5 +1,6 @@
 package com.github.t1.meta.visitor;
 
+import com.github.t1.meta.Property;
 import lombok.*;
 
 import java.math.*;
@@ -9,7 +10,7 @@ public class VisitorDecorator extends Visitor {
 
     public VisitorDecorator(Visitor delegate) { setDelegate(delegate); }
 
-    public void setDelegate(Visitor delegate) {
+    protected void setDelegate(Visitor delegate) {
         this.delegate = delegate;
         delegate.setSelf(this.getSelf());
         delegate.setVisit(this.getSelf().getVisit());
@@ -34,9 +35,7 @@ public class VisitorDecorator extends Visitor {
     @Override public void leaveMapping() { delegate.leaveMapping(); }
 
 
-    @Override public void enterProperty(Object key) { delegate.enterProperty(key); }
-
-    @Override public void enterProperty(String key) { delegate.enterProperty(key); }
+    @Override public void enterProperty(Property property) { delegate.enterProperty(property); }
 
     @Override public void leaveProperty() { delegate.leaveProperty(); }
 

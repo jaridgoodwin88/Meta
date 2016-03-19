@@ -1,6 +1,6 @@
 package com.github.t1.metatest;
 
-import com.github.t1.meta.Meta;
+import com.github.t1.meta.*;
 import com.github.t1.meta.visitor.Visitor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public abstract class AbstractVisitorTest {
     private static final double SOME_FLOAT = 123.4;
     private static final double SOME_DOUBLE = 123.45d;
 
-    private final Meta meta = new Meta();
+    final Meta meta = new Meta();
 
     final Visitor visitor = new Visitor() {
         private final StringBuilder out = new StringBuilder();
@@ -37,9 +37,7 @@ public abstract class AbstractVisitorTest {
             out.append("}");
         }
 
-        @Override public void enterProperty(String key) {
-            out.append(key).append(":");
-        }
+        @Override public void enterProperty(Property property) { out.append(property.name()).append(":"); }
 
         @Override public void leaveProperty() {
             out.append(";");
@@ -153,7 +151,10 @@ public abstract class AbstractVisitorTest {
         assertThat(visitor).hasToString("<123.45>");
     }
 
-    enum E {ONE, TWO, THREE}
+    @SuppressWarnings("unused")
+    private enum E {
+        ONE, TWO, THREE
+    }
 
     @Test
     public void shouldVisitEnumScalar() {
@@ -245,9 +246,7 @@ public abstract class AbstractVisitorTest {
                 depths.add(guide().depth());
             }
 
-            @Override public void enterProperty(String key) {
-                depths.add(guide().depth());
-            }
+            @Override public void enterProperty(Property property) { depths.add(guide().depth()); }
 
             @Override public void enterSequence() {
                 depths.add(guide().depth());

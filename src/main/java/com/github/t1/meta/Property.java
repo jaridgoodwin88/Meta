@@ -1,7 +1,10 @@
 package com.github.t1.meta;
 
-public interface Property {
-    Object getName();
+import java.lang.reflect.AnnotatedElement;
 
-    Object getValue();
+/** Meta data about a property */
+public interface Property {
+    Object name();
+
+    AnnotatedElement annotations();
 }

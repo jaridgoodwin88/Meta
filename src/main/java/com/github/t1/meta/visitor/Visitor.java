@@ -1,5 +1,6 @@
 package com.github.t1.meta.visitor;
 
+import com.github.t1.meta.Property;
 import lombok.*;
 
 import java.math.*;
@@ -15,7 +16,7 @@ public abstract class Visitor {
 
     public Guide guide() { return self.visit.currentGuide(); }
 
-    public Object destination() { return guide().destination(); }
+    protected Object destination() { return guide().destination(); }
 
 
     public void enterMapping() {}
@@ -25,11 +26,7 @@ public abstract class Visitor {
     public void leaveMapping() {}
 
 
-    public void enterProperty(Object key) {
-        self.enterProperty((key == null) ? null : key.toString());
-    }
-
-    public void enterProperty(String key) {}
+    public void enterProperty(Property property) {}
 
     public void leaveProperty() {}
 

@@ -1,11 +1,14 @@
 package com.github.t1.metatest;
 
+import com.github.t1.meta.Property;
+import com.github.t1.meta.visitor.Visitor;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
@@ -57,6 +60,7 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
 
     @Override protected Object createSequenceWithMapping() {
         Pojo c = new Pojo();
+        //noinspection deprecation
         c.one = null;
         return ImmutableList.of(new Pojo(), new Object(), c);
     }
@@ -64,15 +68,35 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Test
     public void shouldVisitSubclass() {
         class Super {
-            String superField = "super";
+            @SuppressWarnings("unused") String superField = "super";
         }
         class Sub extends Super {
-            String subField = "sub";
+            @SuppressWarnings("unused") String subField = "sub";
         }
         Sub sub = new Sub();
 
         tour(sub);
 
         assertThat(visitor).hasToString("{superField:<super>;|subField:<sub>;}");
+    }
+
+    @Test
+    public void shouldVisitMappingWithAnnotations() {
+        @Data
+        class Pojo {
+            @Deprecated
+            private String one = "a";
+        }
+        Object object = new Pojo();
+
+        AtomicReference<Property> property = new AtomicReference<>();
+        meta.visitTo(object).by(new Visitor() {
+            @Override public void enterProperty(Property p) {
+                property.set(p);
+            }
+        }).run();
+
+        assertThat(property.get().name()).isEqualTo("one");
+        assertThat(property.get().annotations().isAnnotationPresent(Deprecated.class)).isTrue();
     }
 }

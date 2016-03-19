@@ -1,23 +1,17 @@
 package com.github.t1.meta.visitor;
 
-import com.github.t1.meta.Property;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.Value;
+import com.github.t1.stereotypes.Annotations;
+import lombok.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 class ReflectionGuide extends MappingGuide {
     private final Object object;
 
-    @Override protected Stream<Property> getProperties() {
+    @Override protected Stream<PropertyWithValue> getProperties() {
         return classHierarchy(object.getClass())
                 .flatMap(this::fields)
                 .filter(this::isProperty)
@@ -43,11 +37,15 @@ class ReflectionGuide extends MappingGuide {
     }
 
     @Value
-    private class ReflectionProperty implements Property {
+    private class ReflectionProperty implements PropertyWithValue {
         private final Field field;
 
-        @Override public Object getName() {
+        @Override public Object name() {
             return field.getName();
+        }
+
+        @Override public AnnotatedElement annotations() {
+            return Annotations.on(field);
         }
 
         @SneakyThrows(IllegalAccessException.class)
