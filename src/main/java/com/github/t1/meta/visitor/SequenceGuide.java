@@ -2,7 +2,7 @@ package com.github.t1.meta.visitor;
 
 import java.util.stream.Stream;
 
-public abstract class SequenceGuide extends Guide {
+abstract class SequenceGuide extends Guide {
     @Override public void run(Visit visit) {
         Visitor visitor = visit.getVisitor();
         visitor.enterSequence();
@@ -12,7 +12,7 @@ public abstract class SequenceGuide extends Guide {
                 visitor.visitNull();
             } else {
                 continueMapping.call();
-                visitor.enterItem();
+                visitor.enterItem(item);
                 visit.to(item);
                 visitor.leaveItem();
             }

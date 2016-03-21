@@ -33,7 +33,7 @@ public abstract class Visitor {
 
     public void enterSequence() {}
 
-    public void enterItem() {}
+    public void enterItem(Object item) {}
 
     public void continueSequence() {}
 

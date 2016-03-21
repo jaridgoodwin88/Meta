@@ -47,7 +47,7 @@ public abstract class AbstractVisitorTest {
             out.append("[");
         }
 
-        @Override public void enterItem() { out.append("«"); }
+        @Override public void enterItem(Object item) { out.append("«"); }
 
         @Override public void leaveItem() { out.append("»"); }
 

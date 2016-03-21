@@ -42,7 +42,7 @@ public class VisitorDecorator extends Visitor {
 
     @Override public void enterSequence() { delegate.enterSequence(); }
 
-    @Override public void enterItem() { delegate.enterItem(); }
+    @Override public void enterItem(Object item) { delegate.enterItem(item); }
 
     @Override public void continueSequence() { delegate.continueSequence(); }
 

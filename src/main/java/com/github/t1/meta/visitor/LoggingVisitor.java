@@ -41,9 +41,9 @@ public class LoggingVisitor extends VisitorDecorator {
         super.enterSequence();
     }
 
-    @Override public void enterItem() {
+    @Override public void enterItem(Object item) {
         log.debug("enterItem");
-        super.enterItem();
+        super.enterItem(item);
     }
 
     @Override public void continueSequence() {
