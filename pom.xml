@@ -30,7 +30,7 @@
         <repository>
             <id>bintray-t1-javaee-helpers</id>
             <name>t1-javaee-helpers-meta</name>
-            <url>https://api.bintray.com/maven/t1/javaee-helpers/meta</url>
+            <url>https://api.bintray.com/maven/t1/javaee-helpers/meta/;publish=1</url>
         </repository>
     </distributionManagement>
 
