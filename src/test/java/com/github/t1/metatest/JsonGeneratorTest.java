@@ -2,10 +2,11 @@ package com.github.t1.metatest;
 
 import com.github.t1.meta.Meta;
 import com.github.t1.meta.out.JsonGenerator;
-import com.google.common.collect.*;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 
 import static java.math.BigInteger.*;
 import static org.assertj.core.api.Assertions.*;
@@ -24,7 +25,7 @@ public class JsonGeneratorTest {
         Object nil = null;
     }
 
-    private final ImmutableMap<?, ?> map = ImmutableMap.of(
+    private final Map<?, ?> map = Map.of(
             "string", "a",
             "number", PI,
             "bool", true,
@@ -32,7 +33,7 @@ public class JsonGeneratorTest {
 
     private final Object[] array = new Object[] { "a", PI, true, TEN, null };
 
-    private final ImmutableList<?> list = ImmutableList.of("a", PI, true, TEN);
+    private final List<?> list = List.of("a", PI, true, TEN);
 
     @Test
     public void shouldGeneratePlainJsonObjectFromPojo() {
@@ -53,9 +54,9 @@ public class JsonGeneratorTest {
     public void shouldGenerateJsonObjectFromNestedPojo() {
         @SuppressWarnings("unused")
         class Container {
-            Pojo pojo = new Pojo();
-            Object[] array = JsonGeneratorTest.this.array;
-            Object[] nested = { new Pojo(), true };
+            final Pojo pojo = new Pojo();
+            final Object[] array = JsonGeneratorTest.this.array;
+            final Object[] nested = { new Pojo(), true };
         }
         Container container = new Container();
 

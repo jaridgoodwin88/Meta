@@ -2,7 +2,6 @@ package com.github.t1.metatest;
 
 import com.github.t1.meta.Meta;
 import com.github.t1.meta.builder.Builder;
-import com.google.common.collect.ImmutableMap;
 import lombok.Data;
 import org.junit.Test;
 
@@ -16,13 +15,12 @@ public class MetaBuilderTest {
 
     @Test
     public void shouldBuildMap() {
-        @SuppressWarnings("unchecked")
-        Builder<Map<String, String>> builder = meta.builderFor(new TypeLiteral<Map<String, String>>() {});
+        Builder<Map<String, String>> builder = meta.builderFor(new TypeLiteral<>() {});
 
         builder.set("key1", "value1");
         builder.set("key2", "value2");
 
-        assertThat(builder.build()).isEqualTo(ImmutableMap.of("key1", "value1", "key2", "value2"));
+        assertThat(builder.build()).isEqualTo(Map.of("key1", "value1", "key2", "value2"));
     }
 
     @Data
@@ -45,7 +43,7 @@ public class MetaBuilderTest {
 
     @Test
     public void shouldBuildPojoFromTypeLiteral() {
-        Builder<Pojo> builder = meta.builderFor(new TypeLiteral<Pojo>() {});
+        Builder<Pojo> builder = meta.builderFor(new TypeLiteral<>() {});
 
         builder.set("key1", "value1");
         builder.set("key2", "value2");

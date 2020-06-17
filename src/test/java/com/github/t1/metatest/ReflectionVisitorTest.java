@@ -2,7 +2,6 @@ package com.github.t1.metatest;
 
 import com.github.t1.meta.Property;
 import com.github.t1.meta.visitor.Visitor;
-import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class ReflectionVisitorTest extends AbstractVisitorTest {
     @Data
-    public class PojoContainer implements Serializable {
+    public static class PojoContainer implements Serializable {
         // ignore non-static 'this'
         private static final long serialVersionUID = -1L; // must be ignored
 
@@ -51,7 +50,7 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
     public static class MappingWithSequence {
         String[] a = { "x", "y", null, "z" };
         List<String> b = emptyList();
-        List<String> c = ImmutableList.of("x");
+        List<String> c = List.of("x");
     }
 
     @Override protected Object createMappingWithSequence() {
@@ -60,18 +59,17 @@ public class ReflectionVisitorTest extends AbstractVisitorTest {
 
     @Override protected Object createSequenceWithMapping() {
         Pojo c = new Pojo();
-        //noinspection deprecation
         c.one = null;
-        return ImmutableList.of(new Pojo(), new Object(), c);
+        return List.of(new Pojo(), new Object(), c);
     }
 
     @Test
     public void shouldVisitSubclass() {
         class Super {
-            @SuppressWarnings("unused") String superField = "super";
+            @SuppressWarnings("unused") final String superField = "super";
         }
         class Sub extends Super {
-            @SuppressWarnings("unused") String subField = "sub";
+            @SuppressWarnings("unused") final String subField = "sub";
         }
         Sub sub = new Sub();
 

@@ -1,7 +1,5 @@
 package com.github.t1.metatest;
 
-import com.google.common.collect.*;
-
 import java.util.*;
 
 import static java.util.Arrays.*;
@@ -16,7 +14,7 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
     }
 
     @Override protected Object createNestedMapping() {
-        return ImmutableMap.of("mappingOne", createFlatMapping());
+        return Map.of("mappingOne", createFlatMapping());
     }
 
     @Override protected Object createFlatSequence() {
@@ -24,14 +22,14 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
     }
 
     @Override protected Object createNestedSequence() {
-        return ImmutableList.of(ImmutableList.of("a1", "a2", "a3"), ImmutableList.of(), ImmutableList.of("c1"));
+        return List.of(List.of("a1", "a2", "a3"), List.of(), List.of("c1"));
     }
 
     @Override protected Object createMappingWithSequence() {
-        return ImmutableMap.of(
+        return Map.of(
                 "a", asList("x", "y", null, "z"),
-                "b", ImmutableList.of(),
-                "c", ImmutableList.of("x"));
+                "b", List.of(),
+                "c", List.of("x"));
     }
 
     @Override protected Object createSequenceWithMapping() {
@@ -39,9 +37,9 @@ public class CollectionsVisitorTest extends AbstractVisitorTest {
         map3.put("one", null);
         map3.put("two", "b");
         map3.put("nil", null);
-        return ImmutableList.of(
+        return List.of(
                 createFlatMapping(),
-                ImmutableMap.of(),
+                Map.of(),
                 map3);
     }
 }
