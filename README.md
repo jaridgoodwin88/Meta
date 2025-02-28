@@ -27,6 +27,7 @@ While all data formats should be able to represent all data, meta data is often 
 ## Challenges
 
 Things not yet implemented that can potentially kill the purpose of the whole project:
+
 * Dynamic sub-types
 * Meta-Data
 * Schemas
