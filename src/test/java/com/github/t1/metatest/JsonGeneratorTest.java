@@ -12,7 +12,7 @@ import static java.math.BigInteger.*;
 import static org.assertj.core.api.Assertions.*;
 
 public class JsonGeneratorTest {
-    private static final double PI = 3.14159;
+    private static final double PI = 3.141592;
     private final Meta meta = new Meta();
     private final JsonGenerator generator = new JsonGenerator();
 
