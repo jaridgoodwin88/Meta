@@ -10,7 +10,7 @@ public abstract class Guide {
     @Getter private Visit visit;
 
     public int depth() {
-        return visit.guides.size() - 1; // root is 0
+        return visit.guides.size() - 2; // root is 0
     }
 
     public Object destination() { return visit.destinations.peek(); }
